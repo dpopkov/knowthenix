@@ -1,0 +1,9 @@
+# H2 datasource
+spring:
+  datasource:
+    username: sa
+    password:
+    url: jdbc:h2:mem:test
+  jpa:
+    hibernate:
+      ddl-auto: create

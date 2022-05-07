@@ -1,1 +1,3 @@
-
+logging:
+  level:
+    io.dpopkov.knowthenix.DataInitialization: DEBUG
