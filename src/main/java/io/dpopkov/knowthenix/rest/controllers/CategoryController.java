@@ -7,16 +7,16 @@ import io.dpopkov.knowthenix.services.dto.CategoryDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+import static io.dpopkov.knowthenix.config.AppConstants.CATEGORIES_URL;
 import static io.dpopkov.knowthenix.shared.Utils.anyFieldIsMissing;
 
 @Slf4j
 @RestController
-@RequestMapping("/categories")
+@RequestMapping(CATEGORIES_URL)
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -33,5 +33,15 @@ public class CategoryController {
         CategoryDto created = categoryService.create(category);
         log.debug("Created category {}", created);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CategoryDto>> getAllCategories() {   // todo: add paging
+        return new ResponseEntity<>(categoryService.getAll(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CategoryDto> getCategoryById(@PathVariable Long id) {
+        return new ResponseEntity<>(categoryService.getById(id), HttpStatus.OK);
     }
 }

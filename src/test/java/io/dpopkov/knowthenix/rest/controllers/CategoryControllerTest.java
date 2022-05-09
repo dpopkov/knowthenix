@@ -14,13 +14,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static io.dpopkov.knowthenix.config.AppConstants.CATEGORIES_URL;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,7 +53,7 @@ class CategoryControllerTest {
         returnDto.setId(ID);
         given(service.create(any(CategoryDto.class))).willReturn(returnDto);
         // When
-        mockMvc.perform(post("/categories")
+        mockMvc.perform(post(CATEGORIES_URL)
                         .contentType(APPLICATION_JSON)
                         .content(postJson)
         )
@@ -66,5 +67,23 @@ class CategoryControllerTest {
         CategoryDto toCreate = captor.getValue();
         assertEquals(NAME, toCreate.getName());
         assertEquals(DESCRIPTION, toCreate.getDescription());
+    }
+
+    @Test
+    void getAllCategories() throws Exception {
+        // When
+        mockMvc.perform(get(CATEGORIES_URL))
+                .andExpect(status().isOk());
+        // Then
+        then(service).should().getAll();
+    }
+
+    @Test
+    void getCategoryById() throws Exception {
+        // When
+        mockMvc.perform(get(CATEGORIES_URL + "/" + ID))
+                .andExpect(status().isOk());
+        // Then
+        then(service).should().getById(ID);
     }
 }
