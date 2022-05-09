@@ -1,3 +1,4 @@
 logging:
   level:
     io.dpopkov.knowthenix.DataInitialization: DEBUG
+    io.dpopkov.knowthenix.rest.controllers: DEBUG
