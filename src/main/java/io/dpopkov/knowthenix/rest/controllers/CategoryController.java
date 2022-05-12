@@ -27,7 +27,7 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto category) {
-        if (anyFieldIsMissing(category.getName(), category.getDescription())) {
+        if (anyFieldIsMissing(category.getName())) {
             throw new AppControllerException(ErrorMessages.MISSING_REQUIRED_FIELD);
         }
         CategoryDto created = categoryService.create(category);

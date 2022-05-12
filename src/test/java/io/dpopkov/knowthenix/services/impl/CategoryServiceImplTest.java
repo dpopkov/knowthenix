@@ -2,7 +2,7 @@ package io.dpopkov.knowthenix.services.impl;
 
 import io.dpopkov.knowthenix.domain.entities.question.CategoryEntity;
 import io.dpopkov.knowthenix.domain.repositories.CategoryRepository;
-import io.dpopkov.knowthenix.services.CategoryServiceException;
+import io.dpopkov.knowthenix.services.AppServiceException;
 import io.dpopkov.knowthenix.services.dto.CategoryDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,7 +66,7 @@ class CategoryServiceImplTest {
         // Given
         given(categoryRepository.findById(CATEGORY_ID)).willReturn(Optional.empty());
         // Then
-        assertThrows(CategoryServiceException.class, () -> service.getById(CATEGORY_ID));
+        assertThrows(AppServiceException.class, () -> service.getById(CATEGORY_ID));
     }
 
     @Test

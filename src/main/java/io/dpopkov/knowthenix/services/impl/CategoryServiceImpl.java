@@ -3,7 +3,7 @@ package io.dpopkov.knowthenix.services.impl;
 import io.dpopkov.knowthenix.domain.entities.question.CategoryEntity;
 import io.dpopkov.knowthenix.domain.repositories.CategoryRepository;
 import io.dpopkov.knowthenix.services.CategoryService;
-import io.dpopkov.knowthenix.services.CategoryServiceException;
+import io.dpopkov.knowthenix.services.AppServiceException;
 import io.dpopkov.knowthenix.services.dto.CategoryDto;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -32,7 +32,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto getById(Long id) {
         CategoryEntity entity = categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryServiceException("Category not found"));
+                .orElseThrow(() -> new AppServiceException("Category not found"));
         return new ModelMapper().map(entity, CategoryDto.class);
     }
 
