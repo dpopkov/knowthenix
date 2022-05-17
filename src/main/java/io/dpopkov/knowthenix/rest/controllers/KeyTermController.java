@@ -53,4 +53,10 @@ public class KeyTermController {
         KeyTermDto updated = keyTermService.update(keyTerm);
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteKeyTerm(@PathVariable  Long id) {
+        keyTermService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

@@ -115,4 +115,13 @@ class CategoryControllerTest {
         assertEquals(NAME_UPD, toUpdate.getName());
         assertEquals(DESCRIPTION_UPD, toUpdate.getDescription());
     }
+
+    @Test
+    void deleteCategory() throws Exception {
+        // When
+        mockMvc.perform(delete(CATEGORIES_URL + "/" + ID))
+                .andExpect(status().isNoContent());
+        // Then
+        then(service).should().delete(ID);
+    }
 }
