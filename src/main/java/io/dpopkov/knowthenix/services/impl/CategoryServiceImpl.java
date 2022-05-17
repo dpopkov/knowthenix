@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -44,10 +45,15 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto update(CategoryDto dto) {
-        ModelMapper mapper = new ModelMapper();
-        CategoryEntity entity = mapper.map(dto, CategoryEntity.class);
+        Optional<CategoryEntity> byId = categoryRepository.findById(dto.getId());
+        if (byId.isEmpty()) {
+            throw new AppServiceException("Updated Category not found");
+        }
+        CategoryEntity entity = byId.get();
+        entity.setName(dto.getName());
+        entity.setDescription(dto.getDescription());
         CategoryEntity saved = categoryRepository.save(entity);
-        return mapper.map(saved, CategoryDto.class);
+        return new ModelMapper().map(saved, CategoryDto.class);
     }
 
     @Override

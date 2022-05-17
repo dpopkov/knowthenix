@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static io.dpopkov.knowthenix.config.AppConstants.CATEGORIES_URL;
-import static io.dpopkov.knowthenix.shared.Utils.anyFieldIsMissing;
+import static io.dpopkov.knowthenix.shared.Utils.*;
 
 @Slf4j
 @RestController
@@ -43,5 +43,14 @@ public class CategoryController {
     @GetMapping("/{id}")
     public ResponseEntity<CategoryDto> getCategoryById(@PathVariable Long id) {
         return new ResponseEntity<>(categoryService.getById(id), HttpStatus.OK);
+    }
+
+    @PutMapping
+    public ResponseEntity<CategoryDto> updateCategory(@RequestBody CategoryDto category) {
+        if (anyFieldOrIdIsMissing(category, category.getName())) {
+            throw new AppControllerException(ErrorMessages.MISSING_REQUIRED_FIELD);
+        }
+        CategoryDto updated = categoryService.update(category);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 }

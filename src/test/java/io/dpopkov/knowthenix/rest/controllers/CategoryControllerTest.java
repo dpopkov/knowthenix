@@ -30,6 +30,8 @@ class CategoryControllerTest {
     private static final Long ID = 12L;
     private static final String NAME = "name1";
     private static final String DESCRIPTION = "desc1";
+    private static final String NAME_UPD = "name12";
+    private static final String DESCRIPTION_UPD = "desc12";
 
     private final JsonMapper mapper = new JsonMapper();
     @Mock
@@ -85,5 +87,32 @@ class CategoryControllerTest {
                 .andExpect(status().isOk());
         // Then
         then(service).should().getById(ID);
+    }
+
+    @Test
+    void updateCategory() throws Exception {
+        // Given
+        CategoryDto putDto = new CategoryDto(NAME_UPD, DESCRIPTION_UPD);
+        putDto.setId(ID);
+        String putJson = mapper.writeValueAsString(putDto);
+        CategoryDto returnDto = new CategoryDto(NAME_UPD, DESCRIPTION_UPD);
+        returnDto.setId(ID);
+        given(service.update(any(CategoryDto.class))).willReturn(returnDto);
+        // When
+        mockMvc.perform(put(CATEGORIES_URL)
+                .contentType(APPLICATION_JSON)
+                .content(putJson)
+        )
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", is(ID.intValue())))
+                .andExpect(jsonPath("$.name", is(NAME_UPD)))
+                .andExpect(jsonPath("$.description", is(DESCRIPTION_UPD)));
+        // Then
+        then(service).should().update(captor.capture());
+        CategoryDto toUpdate = captor.getValue();
+        assertEquals(ID, toUpdate.getId());
+        assertEquals(NAME_UPD, toUpdate.getName());
+        assertEquals(DESCRIPTION_UPD, toUpdate.getDescription());
     }
 }

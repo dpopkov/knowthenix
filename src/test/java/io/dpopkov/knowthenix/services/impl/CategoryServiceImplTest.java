@@ -84,12 +84,27 @@ class CategoryServiceImplTest {
     @Test
     void update() {
         // Given
+        CategoryEntity entity = new CategoryEntity();
+        entity.setId(CATEGORY_ID);
+        CategoryDto dto = new CategoryDto();
+        dto.setId(CATEGORY_ID);
+        given(categoryRepository.findById(CATEGORY_ID)).willReturn(Optional.of(entity));
         given(categoryRepository.save(any())).willReturn(new CategoryEntity());
         // When
-        CategoryDto updated = service.update(new CategoryDto());
+        CategoryDto updated = service.update(dto);
         // Then
         assertNotNull(updated);
-        then(categoryRepository).should().save(any(CategoryEntity.class));
+        then(categoryRepository).should().save(entity);
+    }
+
+    @Test
+    void update_whenNotFound_throwsException() {
+        // Given
+        CategoryDto dto = new CategoryDto();
+        dto.setId(CATEGORY_ID);
+        given(categoryRepository.findById(CATEGORY_ID)).willReturn(Optional.empty());
+        // Then
+        assertThrows(AppServiceException.class, () -> service.update(dto));
     }
 
     @Test

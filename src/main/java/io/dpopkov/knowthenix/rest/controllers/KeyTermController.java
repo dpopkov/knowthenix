@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static io.dpopkov.knowthenix.config.AppConstants.KEYTERMS_URL;
-import static io.dpopkov.knowthenix.shared.Utils.anyFieldIsMissing;
+import static io.dpopkov.knowthenix.shared.Utils.*;
 
 @Slf4j
 @RestController
@@ -43,5 +43,14 @@ public class KeyTermController {
     @GetMapping("/{id}")
     public ResponseEntity<KeyTermDto> getCategoryById(@PathVariable Long id) {
         return new ResponseEntity<>(keyTermService.getById(id), HttpStatus.OK);
+    }
+
+    @PutMapping
+    public ResponseEntity<KeyTermDto> updateKeyTerm(@RequestBody KeyTermDto keyTerm) {
+        if (anyFieldOrIdIsMissing(keyTerm, keyTerm.getName())) {
+            throw new AppControllerException(ErrorMessages.MISSING_REQUIRED_FIELD);
+        }
+        KeyTermDto updated = keyTermService.update(keyTerm);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class KeyTermServiceImpl implements KeyTermService {
@@ -44,10 +45,15 @@ public class KeyTermServiceImpl implements KeyTermService {
 
     @Override
     public KeyTermDto update(KeyTermDto dto) {
-        ModelMapper mapper = new ModelMapper();
-        KeyTermEntity entity = mapper.map(dto, KeyTermEntity.class);
+        Optional<KeyTermEntity> byId = keyTermRepository.findById(dto.getId());
+        if (byId.isEmpty()) {
+            throw new AppServiceException("Updated KeyTerm not found");
+        }
+        KeyTermEntity entity = byId.get();
+        entity.setName(dto.getName());
+        entity.setDescription(dto.getDescription());
         KeyTermEntity saved = keyTermRepository.save(entity);
-        return mapper.map(saved, KeyTermDto.class);
+        return new ModelMapper().map(saved, KeyTermDto.class);
     }
 
     @Override
