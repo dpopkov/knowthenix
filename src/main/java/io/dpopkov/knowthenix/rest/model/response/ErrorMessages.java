@@ -1,7 +1,8 @@
 package io.dpopkov.knowthenix.rest.model.response;
 
 public enum ErrorMessages {
-    MISSING_REQUIRED_FIELD("Missing required field. Please check documentation for required fields");
+    MISSING_REQUIRED_FIELD("Missing required field. Please check documentation for required fields"),
+    MISSING_ID("Missing ID");
 
     private final String errorMessage;
 

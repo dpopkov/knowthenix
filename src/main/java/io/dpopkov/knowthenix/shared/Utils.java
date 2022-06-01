@@ -12,6 +12,10 @@ public class Utils {
         return false;
     }
 
+    public static boolean idIsMissing(BaseDto dto) {
+        return dto.getId() == null;
+    }
+
     public static boolean anyFieldOrIdIsMissing(BaseDto dto, String... fields) {
         if (dto.getId() == null) {
             return true;
