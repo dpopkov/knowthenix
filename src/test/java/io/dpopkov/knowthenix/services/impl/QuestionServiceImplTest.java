@@ -1,10 +1,14 @@
 package io.dpopkov.knowthenix.services.impl;
 
 import io.dpopkov.knowthenix.domain.entities.question.QuestionEntity;
+import io.dpopkov.knowthenix.domain.entities.question.QuestionTextEntity;
+import io.dpopkov.knowthenix.domain.enums.Language;
 import io.dpopkov.knowthenix.domain.repositories.QuestionRepository;
+import io.dpopkov.knowthenix.domain.repositories.QuestionTextRepository;
 import io.dpopkov.knowthenix.services.AppServiceException;
 import io.dpopkov.knowthenix.services.dto.CategoryDto;
 import io.dpopkov.knowthenix.services.dto.QuestionDto;
+import io.dpopkov.knowthenix.services.dto.TranslationDto;
 import io.dpopkov.knowthenix.services.dto.converters.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,19 +31,23 @@ class QuestionServiceImplTest {
 
     private static final Long ID_1 = 10L;
     private static final Long ID_2 = 11L;
+    private static final Long TRANSLATION_ID_1 = 111L;
 
     @Mock
     QuestionRepository questionRepository;
+    @Mock
+    QuestionTextRepository questionTextRepository;
     QuestionServiceImpl service;
     @Captor
-    ArgumentCaptor<QuestionEntity> entityCaptor;
+    ArgumentCaptor<QuestionEntity> questionEntityCaptor;
 
     @BeforeEach
     void setupService() {
         final QuestionDtoToEntity questionDtoToEntity = new QuestionDtoToEntity(
                 new CategoryDtoToEntity(), new TranslationDtoToQuestionTextEntity());
-        service = new QuestionServiceImpl(questionRepository,
-                new QuestionEntityToDto(new CategoryEntityToDto(), new QuestionTextEntityToDto()), questionDtoToEntity);
+        service = new QuestionServiceImpl(questionRepository, questionTextRepository,
+                new QuestionEntityToDto(new CategoryEntityToDto(), new QuestionTextEntityToDto()), questionDtoToEntity,
+                new TranslationDtoToQuestionTextEntity(), new QuestionTextEntityToDto());
     }
 
     @Test
@@ -86,8 +94,8 @@ class QuestionServiceImplTest {
         final QuestionDto updated = service.update(dto);
         // Then
         assertNotNull(updated);
-        then(questionRepository).should().save(entityCaptor.capture());
-        QuestionEntity captured = entityCaptor.getValue();
+        then(questionRepository).should().save(questionEntityCaptor.capture());
+        QuestionEntity captured = questionEntityCaptor.getValue();
         assertEquals(ID_1, captured.getId());
     }
 
@@ -99,5 +107,35 @@ class QuestionServiceImplTest {
         given(questionRepository.existsById(ID_1)).willReturn(false);
         // When/Then
         assertThrows(AppServiceException.class, () -> service.update(dto));
+    }
+
+    @Test
+    void addTranslation() {
+        // Given
+        QuestionEntity foundQuestion = new QuestionEntity();
+        foundQuestion.setId(ID_1);
+        QuestionTextEntity exitingTranslation = new QuestionTextEntity(Language.RU, "test");
+        foundQuestion.addTranslation(exitingTranslation);
+        given(questionRepository.findById(ID_1)).willReturn(Optional.of(foundQuestion));
+        QuestionTextEntity addedTranslation = new QuestionTextEntity(Language.EN, "test");
+        given(questionTextRepository.save(any(QuestionTextEntity.class))).willReturn(addedTranslation);
+        given(questionRepository.save(any())).willReturn(new QuestionEntity());
+        // When
+        service.addTranslation(ID_1, new TranslationDto());
+        // Then
+        then(questionRepository).should().findById(ID_1);
+        then(questionTextRepository).should().save(any(QuestionTextEntity.class));
+        then(questionRepository).should().save(questionEntityCaptor.capture());
+        QuestionEntity captured = questionEntityCaptor.getValue();
+        assertEquals(ID_1, captured.getId());
+        assertEquals(2, captured.getTranslations().size());
+    }
+
+    @Test
+    void addTranslation_whenNoQuestionFound_thenThrowException() {
+        // Given
+        given(questionRepository.findById(ID_1)).willReturn(Optional.empty());
+        // When/Then
+        assertThrows(AppServiceException.class, () -> service.addTranslation(ID_1, new TranslationDto()));
     }
 }

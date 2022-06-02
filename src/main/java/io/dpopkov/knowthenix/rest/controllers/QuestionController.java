@@ -4,6 +4,7 @@ import io.dpopkov.knowthenix.rest.exceptions.AppControllerException;
 import io.dpopkov.knowthenix.rest.model.response.ErrorMessages;
 import io.dpopkov.knowthenix.services.QuestionService;
 import io.dpopkov.knowthenix.services.dto.QuestionDto;
+import io.dpopkov.knowthenix.services.dto.TranslationDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,5 +42,12 @@ public class QuestionController {
         }
         QuestionDto updated = questionService.update(questionDto);
         return new ResponseEntity<>(updated, HttpStatus.OK);
+    }
+
+    @PostMapping("/{questionId}/translations")
+    public ResponseEntity<TranslationDto> addTranslation(@PathVariable("questionId") Long questionId,
+                                                         @RequestBody TranslationDto translation) {
+        TranslationDto created = questionService.addTranslation(questionId, translation);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 }

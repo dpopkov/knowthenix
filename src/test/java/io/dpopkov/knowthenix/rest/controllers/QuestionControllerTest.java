@@ -3,6 +3,7 @@ package io.dpopkov.knowthenix.rest.controllers;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import io.dpopkov.knowthenix.services.QuestionService;
 import io.dpopkov.knowthenix.services.dto.QuestionDto;
+import io.dpopkov.knowthenix.services.dto.TranslationDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,11 +18,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static io.dpopkov.knowthenix.config.AppConstants.QUESTIONS_URL;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class QuestionControllerTest {
 
     private static final Long ID_1 = 12L;
+    private static final Long TRANSLATION_ID = 123L;
 
     private final JsonMapper mapper = new JsonMapper();
     @Mock
@@ -86,5 +88,24 @@ class QuestionControllerTest {
         then(questionService).should().update(dtoCaptor.capture());
         QuestionDto captured = dtoCaptor.getValue();
         assertEquals(ID_1, captured.getId());
+    }
+
+    @Test
+    void addTranslation() throws Exception {
+        // Given
+        TranslationDto postDto = new TranslationDto();
+        String postJson = mapper.writeValueAsString(postDto);
+        TranslationDto returnDto = new TranslationDto();
+        returnDto.setId(TRANSLATION_ID);
+        given(questionService.addTranslation(anyLong(), any(TranslationDto.class))).willReturn(returnDto);
+        // When
+        mockMvc.perform(post(QUESTIONS_URL + "/" + ID_1 + "/translations")
+                .contentType(APPLICATION_JSON)
+                .content(postJson)
+        )
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(APPLICATION_JSON));
+        // Then
+        then(questionService).should().addTranslation(anyLong(), any(TranslationDto.class));
     }
 }
