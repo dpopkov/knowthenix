@@ -44,10 +44,26 @@ public class QuestionController {
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
+    @GetMapping("/{questionId}/translations")
+    public ResponseEntity<List<TranslationDto>> getTranslationsByQuestionId(@PathVariable("questionId") Long questionId) {
+        List<TranslationDto> translations = questionService.getTranslations(questionId);
+        return new ResponseEntity<>(translations, HttpStatus.OK);
+    }
+
     @PostMapping("/{questionId}/translations")
     public ResponseEntity<TranslationDto> addTranslation(@PathVariable("questionId") Long questionId,
                                                          @RequestBody TranslationDto translation) {
         TranslationDto created = questionService.addTranslation(questionId, translation);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{questionId}/translations")
+    public ResponseEntity<TranslationDto> updateTranslation(@PathVariable("questionId") Long questionId,
+                                                            @RequestBody TranslationDto translation) {
+        if (idIsMissing(translation)) {
+            throw new AppControllerException(ErrorMessages.MISSING_ID);
+        }
+        TranslationDto updated = questionService.updateTranslation(questionId, translation);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 }

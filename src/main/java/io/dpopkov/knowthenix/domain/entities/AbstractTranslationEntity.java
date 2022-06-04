@@ -4,6 +4,7 @@ import io.dpopkov.knowthenix.domain.enums.Language;
 import io.dpopkov.knowthenix.domain.enums.TextType;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -43,6 +44,15 @@ public abstract class AbstractTranslationEntity extends ModifiableEntity {
         this.language = language;
         this.type = type;
         this.text = text;
+    }
+
+    public void copyFrom(@Nullable AbstractTranslationEntity other) {
+        if (other == null) {
+            throw new IllegalArgumentException("The source entity is null");
+        }
+        this.language = other.getLanguage();
+        this.type = other.getType();
+        this.text = other.getText();
     }
 
     @Override

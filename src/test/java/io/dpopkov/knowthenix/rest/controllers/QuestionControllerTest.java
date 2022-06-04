@@ -1,6 +1,7 @@
 package io.dpopkov.knowthenix.rest.controllers;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import io.dpopkov.knowthenix.rest.exceptions.AppControllerException;
 import io.dpopkov.knowthenix.services.QuestionService;
 import io.dpopkov.knowthenix.services.dto.QuestionDto;
 import io.dpopkov.knowthenix.services.dto.TranslationDto;
@@ -39,6 +40,8 @@ class QuestionControllerTest {
     QuestionController controller;
     @Captor
     ArgumentCaptor<QuestionDto> dtoCaptor;
+    @Captor
+    ArgumentCaptor<Long> questionIdCaptor;
     MockMvc mockMvc;
 
     @BeforeEach
@@ -107,5 +110,39 @@ class QuestionControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON));
         // Then
         then(questionService).should().addTranslation(anyLong(), any(TranslationDto.class));
+    }
+
+    @Test
+    void updateTranslation() throws Exception {
+        // Given
+        TranslationDto putDto = new TranslationDto();
+        putDto.setId(TRANSLATION_ID);
+        String putJson = mapper.writeValueAsString(putDto);
+        TranslationDto returnDto = new TranslationDto();
+        given(questionService.updateTranslation(anyLong(), any(TranslationDto.class))).willReturn(returnDto);
+        // When
+        mockMvc.perform(put(QUESTIONS_URL + "/" + ID_1 + "/translations")
+                .contentType(APPLICATION_JSON)
+                .content(putJson)
+        )
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON));
+        // Then
+        then(questionService).should().updateTranslation(questionIdCaptor.capture(), any(TranslationDto.class));
+        assertEquals(ID_1, questionIdCaptor.getValue());
+    }
+
+    @Test
+    void updateTranslation_whenNoTranslationId_thenThrowException() throws Exception {
+        // Given
+        TranslationDto putDto = new TranslationDto();
+        String putJson = mapper.writeValueAsString(putDto);
+        // When/Then
+        mockMvc.perform(put(QUESTIONS_URL + "/" + ID_1 + "/translations")
+                .contentType(APPLICATION_JSON)
+                .content(putJson)
+        )
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof AppControllerException));
     }
 }

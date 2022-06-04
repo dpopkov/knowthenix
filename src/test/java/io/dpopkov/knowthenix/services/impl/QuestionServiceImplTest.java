@@ -138,4 +138,40 @@ class QuestionServiceImplTest {
         // When/Then
         assertThrows(AppServiceException.class, () -> service.addTranslation(ID_1, new TranslationDto()));
     }
+
+    @Test
+    void updateTranslation() {
+        // Given
+        given(questionRepository.existsById(ID_1)).willReturn(true);
+        given(questionTextRepository.findById(TRANSLATION_ID_1)).willReturn(Optional.of(new QuestionTextEntity()));
+        given(questionTextRepository.save(any())).willReturn(new QuestionTextEntity());
+        TranslationDto toUpdate = new TranslationDto("EN", "PLAINTEXT", "text");
+        toUpdate.setId(TRANSLATION_ID_1);
+        // When
+        final TranslationDto updated = service.updateTranslation(ID_1, toUpdate);
+        // Then
+        assertNotNull(updated);
+        then(questionRepository).should().existsById(ID_1);
+        then(questionTextRepository).should().findById(TRANSLATION_ID_1);
+        then(questionTextRepository).should().save(any(QuestionTextEntity.class));
+    }
+
+    @Test
+    void updateTranslation_whenNoQuestionFound_thenThrowException() {
+        // Given
+        given(questionRepository.existsById(ID_1)).willReturn(false);
+        // When/Then
+        assertThrows(AppServiceException.class, () -> service.updateTranslation(ID_1, new TranslationDto()));
+    }
+
+    @Test
+    void updateTranslation_whenNoTranslationFound_thenThrowException() {
+        // Given
+        given(questionRepository.existsById(ID_1)).willReturn(true);
+        given(questionTextRepository.findById(TRANSLATION_ID_1)).willReturn(Optional.empty());
+        TranslationDto toUpdate = new TranslationDto();
+        toUpdate.setId(TRANSLATION_ID_1);
+        // When/Then
+        assertThrows(AppServiceException.class, () -> service.updateTranslation(ID_1, toUpdate));
+    }
 }
