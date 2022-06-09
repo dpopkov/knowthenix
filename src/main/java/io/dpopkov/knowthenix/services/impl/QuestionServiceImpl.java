@@ -42,8 +42,12 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionDto create(QuestionDto dto) {
-        // todo: write test and implement
-        return null;
+        if (dto.getId() != null) {
+            throw new AppServiceException("Question has ID - it is not new");
+        }
+        QuestionEntity entity = questionDtoToEntity.convert(dto);
+        QuestionEntity saved = questionRepository.save(entity);
+        return questionEntityToDto.convert(saved);
     }
 
     @Override

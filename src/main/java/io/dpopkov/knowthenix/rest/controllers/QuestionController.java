@@ -35,6 +35,12 @@ public class QuestionController {
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
+    @PostMapping
+    public ResponseEntity<QuestionDto> addNewQuestion(@RequestBody QuestionDto questionDto) {
+        QuestionDto saved = questionService.create(questionDto);
+        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+    }
+
     @PutMapping
     public ResponseEntity<QuestionDto> updateQuestion(@RequestBody QuestionDto questionDto) {
         if (idIsMissing(questionDto)) {

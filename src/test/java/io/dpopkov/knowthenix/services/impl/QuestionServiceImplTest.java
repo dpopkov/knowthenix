@@ -51,6 +51,20 @@ class QuestionServiceImplTest {
     }
 
     @Test
+    void create() {
+        // Given
+        QuestionDto dto = new QuestionDto();
+        dto.setSelectedLanguage("EN");
+        dto.setCategory(new CategoryDto("name", "desc"));
+        given(questionRepository.save(any(QuestionEntity.class))).willReturn(new QuestionEntity());
+        // When
+        final QuestionDto created = service.create(dto);
+        // Then
+        assertNotNull(created);
+        then(questionRepository).should().save(any());
+    }
+
+    @Test
     void getById() {
         // Given
         var entity = new QuestionEntity();

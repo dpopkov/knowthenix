@@ -3,6 +3,7 @@ package io.dpopkov.knowthenix.rest.controllers;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import io.dpopkov.knowthenix.rest.exceptions.AppControllerException;
 import io.dpopkov.knowthenix.services.QuestionService;
+import io.dpopkov.knowthenix.services.dto.CategoryDto;
 import io.dpopkov.knowthenix.services.dto.QuestionDto;
 import io.dpopkov.knowthenix.services.dto.TranslationDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,6 +70,26 @@ class QuestionControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON));
         // Then
         then(questionService).should().getById(ID_1);
+    }
+
+    @Test
+    void addNewQuestion() throws Exception {
+        // Given
+        QuestionDto postDto = new QuestionDto();
+        postDto.setCategory(new CategoryDto("c1", "d1"));
+        String postJson = mapper.writeValueAsString(postDto);
+        QuestionDto returnDto = new QuestionDto();
+        returnDto.setId(ID_1);
+        given(questionService.create(any(QuestionDto.class))).willReturn(returnDto);
+        // When
+        mockMvc.perform(post(QUESTIONS_URL)
+                .contentType(APPLICATION_JSON)
+                .content(postJson)
+        )
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(APPLICATION_JSON));
+        // Then
+        then(questionService).should().create(any(QuestionDto.class));
     }
 
     @Test
