@@ -1,13 +1,16 @@
 package io.dpopkov.knowthenix;
 
 import io.dpopkov.knowthenix.domain.entities.KeyTermEntity;
+import io.dpopkov.knowthenix.domain.entities.answer.SourceEntity;
 import io.dpopkov.knowthenix.domain.entities.question.CategoryEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionTextEntity;
 import io.dpopkov.knowthenix.domain.enums.Language;
+import io.dpopkov.knowthenix.domain.enums.SourceType;
 import io.dpopkov.knowthenix.domain.repositories.CategoryRepository;
 import io.dpopkov.knowthenix.domain.repositories.KeyTermRepository;
 import io.dpopkov.knowthenix.domain.repositories.QuestionRepository;
+import io.dpopkov.knowthenix.domain.repositories.SourceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -20,11 +23,13 @@ public class DataInitialization {
     private final CategoryRepository categoryRepository;
     private final KeyTermRepository keyTermRepository;
     private final QuestionRepository questionRepository;
+    private final SourceRepository sourceRepository;
 
-    public DataInitialization(CategoryRepository categoryRepository, KeyTermRepository keyTermRepository, QuestionRepository questionRepository) {
+    public DataInitialization(CategoryRepository categoryRepository, KeyTermRepository keyTermRepository, QuestionRepository questionRepository, SourceRepository sourceRepository) {
         this.categoryRepository = categoryRepository;
         this.keyTermRepository = keyTermRepository;
         this.questionRepository = questionRepository;
+        this.sourceRepository = sourceRepository;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -63,6 +68,18 @@ public class DataInitialization {
         questionRepository.save(hibernate);
 
         log.debug("initData saved {} questions", questionRepository.count());
+
+        SourceEntity coreJava = SourceEntity.builder().name("Core Java").fullTitle("Core Java, 11th Edition")
+                .url("www.core.org").sourceType(SourceType.BOOK).description("Core Java by Cay Horstmann").build();
+        SourceEntity springInAction = SourceEntity.builder().name("Spring in Action").fullTitle("Spring in Action, 5th Edition")
+                .url("www.spring.org").sourceType(SourceType.BOOK).description("Spring in Action by Craig Walls").build();
+        SourceEntity jdk = SourceEntity.builder().name("JDK API").fullTitle("JDK API documentation")
+                .url("www.jdk.org").sourceType(SourceType.API_DOC).build();
+        sourceRepository.save(coreJava);
+        sourceRepository.save(springInAction);
+        sourceRepository.save(jdk);
+
+        log.debug("initData saved {} sources", sourceRepository.count());
 
         log.debug("initData finished");
     }

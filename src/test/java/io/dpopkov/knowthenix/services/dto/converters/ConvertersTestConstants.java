@@ -7,6 +7,8 @@ public class ConvertersTestConstants {
     protected final Long ID_4 = 12345L;
     protected final String NAME = "name";
     protected final String DESCRIPTION = "desc";
+    protected final String FULL_TITLE = "Full Title";
+    protected final String URL = "http://www.example.com";
     protected final String TEXT = "text123";
     protected final String TEXT_2 = "text1234";
 }
