@@ -27,6 +27,4 @@ public class QuestionEntity extends ModifiableEntity {
     public void addTranslation(QuestionTextEntity translation) {
         translations.put(translation.getLanguage(), translation);
     }
-
-    // todo: add other fields (Source ...)
 }

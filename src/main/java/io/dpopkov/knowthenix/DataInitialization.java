@@ -1,16 +1,15 @@
 package io.dpopkov.knowthenix;
 
 import io.dpopkov.knowthenix.domain.entities.KeyTermEntity;
+import io.dpopkov.knowthenix.domain.entities.answer.AnswerEntity;
+import io.dpopkov.knowthenix.domain.entities.answer.AnswerTextEntity;
 import io.dpopkov.knowthenix.domain.entities.answer.SourceEntity;
 import io.dpopkov.knowthenix.domain.entities.question.CategoryEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionTextEntity;
 import io.dpopkov.knowthenix.domain.enums.Language;
 import io.dpopkov.knowthenix.domain.enums.SourceType;
-import io.dpopkov.knowthenix.domain.repositories.CategoryRepository;
-import io.dpopkov.knowthenix.domain.repositories.KeyTermRepository;
-import io.dpopkov.knowthenix.domain.repositories.QuestionRepository;
-import io.dpopkov.knowthenix.domain.repositories.SourceRepository;
+import io.dpopkov.knowthenix.domain.repositories.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -24,12 +23,16 @@ public class DataInitialization {
     private final KeyTermRepository keyTermRepository;
     private final QuestionRepository questionRepository;
     private final SourceRepository sourceRepository;
+    private final AnswerRepository answerRepository;
 
-    public DataInitialization(CategoryRepository categoryRepository, KeyTermRepository keyTermRepository, QuestionRepository questionRepository, SourceRepository sourceRepository) {
+    public DataInitialization(CategoryRepository categoryRepository, KeyTermRepository keyTermRepository,
+                              QuestionRepository questionRepository, SourceRepository sourceRepository,
+                              AnswerRepository answerRepository) {
         this.categoryRepository = categoryRepository;
         this.keyTermRepository = keyTermRepository;
         this.questionRepository = questionRepository;
         this.sourceRepository = sourceRepository;
+        this.answerRepository = answerRepository;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -80,6 +83,19 @@ public class DataInitialization {
         sourceRepository.save(jdk);
 
         log.debug("initData saved {} sources", sourceRepository.count());
+
+        AnswerEntity springAnswer = new AnswerEntity();
+        springAnswer.setQuestion(spring);
+        springAnswer.setSource(springInAction);
+        springAnswer.setSourceDetails("ch.1.1 p4");
+        springAnswer.setSelectedLanguage(Language.EN);
+        springAnswer.addTranslation(new AnswerTextEntity(Language.EN,
+                "Spring is the framework that will help you achieve your goals"));
+        springAnswer.addTranslation(new AnswerTextEntity(Language.RU,
+                "Spring это фреймворк, который поможет вам достичь ваших целей"));
+        answerRepository.save(springAnswer);
+
+        log.debug("initData saved {} answers", answerRepository.count());
 
         log.debug("initData finished");
     }
