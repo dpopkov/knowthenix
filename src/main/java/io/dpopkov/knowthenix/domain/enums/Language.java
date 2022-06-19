@@ -27,4 +27,8 @@ public enum Language {
     public String getName() {
         return name;
     }
+
+    public static Language from(String value) {
+        return Language.valueOf(value.toUpperCase());
+    }
 }

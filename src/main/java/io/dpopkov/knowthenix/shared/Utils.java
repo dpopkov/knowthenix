@@ -3,6 +3,16 @@ package io.dpopkov.knowthenix.shared;
 import io.dpopkov.knowthenix.services.dto.BaseDto;
 
 public class Utils {
+
+    public static boolean anyIdIsMissing(Long... ids) {
+        for (Long id : ids) {
+            if (id == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean anyFieldIsMissing(String... fields) {
         for (String field : fields) {
             if (field == null || field.isBlank()) {
