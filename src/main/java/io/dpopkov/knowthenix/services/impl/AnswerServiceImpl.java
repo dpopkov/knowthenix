@@ -11,6 +11,7 @@ import io.dpopkov.knowthenix.services.dto.converters.AnswerDtoToEntity;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerEntityToDto;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.dpopkov.knowthenix.shared.Utils.*;
@@ -28,6 +29,14 @@ public class AnswerServiceImpl implements AnswerService {
         this.answerDtoToEntity = answerDtoToEntity;
         this.answerEntityToDto = answerEntityToDto;
         this.sourceRepository = sourceRepository;
+    }
+
+    @Override
+    public List<AnswerDto> getAllForQuestion(Long questionId) {
+        List<AnswerEntity> allByQuestion = answerRepository.findAllByQuestionId(questionId);
+        List<AnswerDto> result = new ArrayList<>();
+        allByQuestion.forEach(e -> result.add(answerEntityToDto.convert(e)));
+        return result;
     }
 
     @Override

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,6 +43,26 @@ class AnswerServiceImplTest {
         service = new AnswerServiceImpl(answerRepository,
                 new AnswerDtoToEntity(new TranslationDtoToAnswerTextEntity()),
                 new AnswerEntityToDto(new AnswerTextEntityToDto()), sourceRepository);
+    }
+
+    @Test
+    void getAllForQuestion() {
+        // Given
+        QuestionEntity question = new QuestionEntity();
+        SourceEntity source = new SourceEntity();
+        AnswerEntity e1 = new AnswerEntity();
+        e1.setQuestion(question);
+        e1.setSource(source);
+        AnswerEntity e2 = new AnswerEntity();
+        e2.setQuestion(question);
+        e2.setSource(source);
+        given(answerRepository.findAllByQuestionId(QUESTION_ID)).willReturn(List.of(e1, e2));
+        // When
+        final List<AnswerDto> allForQuestion = service.getAllForQuestion(QUESTION_ID);
+        // Then
+        assertNotNull(allForQuestion);
+        assertEquals(2, allForQuestion.size());
+        then(answerRepository).should().findAllByQuestionId(QUESTION_ID);
     }
 
     @Test

@@ -95,6 +95,17 @@ public class DataInitialization {
                 "Spring это фреймворк, который поможет вам достичь ваших целей"));
         answerRepository.save(springAnswer);
 
+        AnswerEntity springAnswer2 = new AnswerEntity();
+        springAnswer2.setQuestion(spring);
+        springAnswer2.setSource(coreJava);
+        springAnswer2.setSourceDetails("ch.11.6.1 p691");
+        springAnswer2.setSelectedLanguage(Language.EN);
+        springAnswer2.addTranslation(new AnswerTextEntity(Language.EN,
+                "Spring is the layout in Swing UI library"));
+        springAnswer2.addTranslation(new AnswerTextEntity(Language.RU,
+                "Spring это компонент для размещения контролов при программировании Swing приложений"));
+        answerRepository.save(springAnswer2);
+
         log.debug("initData saved {} answers", answerRepository.count());
 
         log.debug("initData finished");
