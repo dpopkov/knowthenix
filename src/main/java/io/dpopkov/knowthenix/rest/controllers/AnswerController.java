@@ -31,4 +31,16 @@ public class AnswerController {
         AnswerDto created = answerService.create(answerDto);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
+
+    @GetMapping(ANSWERS_URL + "/{answerId}")
+    public ResponseEntity<AnswerDto> getAnswerById(@PathVariable("answerId") Long answerId) {
+        AnswerDto found = answerService.getById(answerId);
+        return new ResponseEntity<>(found, HttpStatus.OK);
+    }
+
+    @PutMapping(ANSWERS_URL)
+    public ResponseEntity<AnswerDto> updateAnswer(@RequestBody AnswerDto answerDto) {
+        AnswerDto updated = answerService.update(answerDto);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
+    }
 }

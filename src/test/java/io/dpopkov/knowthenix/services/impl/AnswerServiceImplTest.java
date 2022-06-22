@@ -99,8 +99,17 @@ class AnswerServiceImplTest {
     @Test
     void getById() {
         // Given
+        AnswerEntity entity = new AnswerEntity();
+        entity.setId(ANSWER_ID);
+        entity.setQuestion(new QuestionEntity());
+        entity.setSource(new SourceEntity());
+        given(answerRepository.findById(ANSWER_ID)).willReturn(Optional.of(entity));
         // When
+        final AnswerDto answer = service.getById(ANSWER_ID);
         // Then
+        assertNotNull(answer);
+        assertEquals(ANSWER_ID, answer.getId());
+        then(answerRepository).should().findById(ANSWER_ID);
     }
 
     @Test
@@ -113,8 +122,28 @@ class AnswerServiceImplTest {
     @Test
     void update() {
         // Given
+        AnswerDto dto = new AnswerDto();
+        dto.setId(ANSWER_ID);
+        dto.setQuestionId(QUESTION_ID);
+        dto.setSourceId(SOURCE_ID);
+        dto.setSelectedLanguage(Language.EN.name());
+        AnswerEntity entity = new AnswerEntity();
+        entity.setId(ANSWER_ID);
+        SourceEntity source = new SourceEntity();
+        source.setId(SOURCE_ID);
+        entity.setSource(source);
+        entity.setQuestion(new QuestionEntity());
+        given(answerRepository.findById(ANSWER_ID)).willReturn(Optional.of(entity));
+        given(answerRepository.save(any(AnswerEntity.class))).willReturn(entity);
         // When
+        final AnswerDto updated = service.update(dto);
         // Then
+        assertNotNull(updated);
+        assertEquals(ANSWER_ID, updated.getId());
+        then(answerRepository).should().save(answerCaptor.capture());
+        AnswerEntity toSave = answerCaptor.getValue();
+        assertEquals(ANSWER_ID, toSave.getId());
+
     }
 
     @Test

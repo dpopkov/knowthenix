@@ -24,7 +24,8 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerEntityToDto answerEntityToDto;
     private final SourceRepository sourceRepository;
 
-    public AnswerServiceImpl(AnswerRepository answerRepository, AnswerDtoToEntity answerDtoToEntity, AnswerEntityToDto answerEntityToDto, SourceRepository sourceRepository) {
+    public AnswerServiceImpl(AnswerRepository answerRepository, AnswerDtoToEntity answerDtoToEntity,
+                             AnswerEntityToDto answerEntityToDto, SourceRepository sourceRepository) {
         this.answerRepository = answerRepository;
         this.answerDtoToEntity = answerDtoToEntity;
         this.answerEntityToDto = answerEntityToDto;
@@ -58,7 +59,9 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public AnswerDto getById(Long id) {
-        return null;
+        AnswerEntity found = answerRepository.findById(id).orElseThrow(
+                () -> new AppServiceException("Cannot find Answer by ID " + id));
+        return answerEntityToDto.convert(found);
     }
 
     @Override
@@ -68,7 +71,23 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public AnswerDto update(AnswerDto dto) {
-        return null;
+        if (anyIdIsMissing(dto.getQuestionId(), dto.getSourceId())) {
+            throw new AppServiceException(
+                    "Some of IDs of associated Question or Source for the updated Answer are missing");
+        }
+        AnswerEntity foundEntity = answerRepository.findById(dto.getId()).orElseThrow(
+                () -> new AppServiceException("Cannot find Answer by ID " + dto.getId()));
+        if (!foundEntity.getSource().getId().equals(dto.getSourceId())) {
+            SourceEntity updatedSource = sourceRepository.findById(dto.getSourceId()).orElseThrow(
+                    () -> new AppServiceException("Cannot find Source by ID " + dto.getSourceId()));
+            foundEntity.setSource(updatedSource);
+        }
+        AnswerEntity draftEntity = answerDtoToEntity.convert(dto);
+        foundEntity.setSourceDetails(draftEntity.getSourceDetails());
+        foundEntity.setSelectedLanguage(draftEntity.getSelectedLanguage());
+        foundEntity.setTranslations(draftEntity.getTranslations());
+        AnswerEntity saved = answerRepository.save(foundEntity);
+        return answerEntityToDto.convert(saved);
     }
 
     @Override
