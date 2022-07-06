@@ -2,6 +2,7 @@ package io.dpopkov.knowthenix.rest.controllers;
 
 import io.dpopkov.knowthenix.services.AnswerService;
 import io.dpopkov.knowthenix.services.dto.AnswerDto;
+import io.dpopkov.knowthenix.services.dto.TranslationDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,5 +43,11 @@ public class AnswerController {
     public ResponseEntity<AnswerDto> updateAnswer(@RequestBody AnswerDto answerDto) {
         AnswerDto updated = answerService.update(answerDto);
         return new ResponseEntity<>(updated, HttpStatus.OK);
+    }
+
+    @GetMapping(ANSWERS_URL + "/{answerId}/translations")
+    public ResponseEntity<List<TranslationDto>> getTranslationsByAnswerId(@PathVariable("answerId") Long answerId) {
+        List<TranslationDto> translations = answerService.getTranslations(answerId);
+        return new ResponseEntity<>(translations, HttpStatus.OK);
     }
 }

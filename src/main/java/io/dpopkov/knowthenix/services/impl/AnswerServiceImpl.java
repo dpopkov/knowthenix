@@ -1,17 +1,21 @@
 package io.dpopkov.knowthenix.services.impl;
 
 import io.dpopkov.knowthenix.domain.entities.answer.AnswerEntity;
+import io.dpopkov.knowthenix.domain.entities.answer.AnswerTextEntity;
 import io.dpopkov.knowthenix.domain.entities.answer.SourceEntity;
 import io.dpopkov.knowthenix.domain.repositories.AnswerRepository;
 import io.dpopkov.knowthenix.domain.repositories.SourceRepository;
 import io.dpopkov.knowthenix.services.AnswerService;
 import io.dpopkov.knowthenix.services.AppServiceException;
 import io.dpopkov.knowthenix.services.dto.AnswerDto;
+import io.dpopkov.knowthenix.services.dto.TranslationDto;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerDtoToEntity;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerEntityToDto;
+import io.dpopkov.knowthenix.services.dto.converters.AnswerTextEntityToDto;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static io.dpopkov.knowthenix.shared.Utils.*;
@@ -22,13 +26,15 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerRepository answerRepository;
     private final AnswerDtoToEntity answerDtoToEntity;
     private final AnswerEntityToDto answerEntityToDto;
+    private final AnswerTextEntityToDto answerTextEntityToDto;
     private final SourceRepository sourceRepository;
 
     public AnswerServiceImpl(AnswerRepository answerRepository, AnswerDtoToEntity answerDtoToEntity,
-                             AnswerEntityToDto answerEntityToDto, SourceRepository sourceRepository) {
+                             AnswerEntityToDto answerEntityToDto, AnswerTextEntityToDto answerTextEntityToDto, SourceRepository sourceRepository) {
         this.answerRepository = answerRepository;
         this.answerDtoToEntity = answerDtoToEntity;
         this.answerEntityToDto = answerEntityToDto;
+        this.answerTextEntityToDto = answerTextEntityToDto;
         this.sourceRepository = sourceRepository;
     }
 
@@ -93,5 +99,14 @@ public class AnswerServiceImpl implements AnswerService {
     @Override
     public void delete(Long id) {
 
+    }
+
+    @Override
+    public List<TranslationDto> getTranslations(Long answerId) {
+        AnswerEntity answerEntity = answerRepository.findById(answerId).orElseThrow();
+        final Collection<AnswerTextEntity> values = answerEntity.getTranslations().values();
+        List<TranslationDto> result = new ArrayList<>();
+        values.forEach(textEntity -> result.add(answerTextEntityToDto.convert(textEntity)));
+        return result;
     }
 }
