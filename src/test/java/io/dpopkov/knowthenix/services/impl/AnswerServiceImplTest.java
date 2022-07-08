@@ -5,9 +5,9 @@ import io.dpopkov.knowthenix.domain.entities.answer.SourceEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionEntity;
 import io.dpopkov.knowthenix.domain.enums.Language;
 import io.dpopkov.knowthenix.domain.repositories.AnswerRepository;
+import io.dpopkov.knowthenix.domain.repositories.AnswerTextRepository;
 import io.dpopkov.knowthenix.domain.repositories.SourceRepository;
 import io.dpopkov.knowthenix.services.dto.AnswerDto;
-import io.dpopkov.knowthenix.services.dto.TranslationDto;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerDtoToEntity;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerEntityToDto;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerTextEntityToDto;
@@ -35,6 +35,8 @@ class AnswerServiceImplTest {
     AnswerRepository answerRepository;
     @Mock
     SourceRepository sourceRepository;
+    @Mock
+    AnswerTextRepository answerTextRepository;
     AnswerServiceImpl service;
     @Captor
     ArgumentCaptor<AnswerEntity> answerCaptor;
@@ -43,7 +45,8 @@ class AnswerServiceImplTest {
     void setup() {
         service = new AnswerServiceImpl(answerRepository,
                 new AnswerDtoToEntity(new TranslationDtoToAnswerTextEntity()),
-                new AnswerEntityToDto(new AnswerTextEntityToDto()), new AnswerTextEntityToDto(), sourceRepository);
+                new AnswerEntityToDto(new AnswerTextEntityToDto()), new AnswerTextEntityToDto(),
+                new TranslationDtoToAnswerTextEntity(), answerTextRepository, sourceRepository);
     }
 
     @Test

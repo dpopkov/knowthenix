@@ -1,5 +1,7 @@
 package io.dpopkov.knowthenix.rest.controllers;
 
+import io.dpopkov.knowthenix.rest.exceptions.AppControllerException;
+import io.dpopkov.knowthenix.rest.model.response.ErrorMessages;
 import io.dpopkov.knowthenix.services.AnswerService;
 import io.dpopkov.knowthenix.services.dto.AnswerDto;
 import io.dpopkov.knowthenix.services.dto.TranslationDto;
@@ -11,6 +13,7 @@ import java.util.List;
 
 import static io.dpopkov.knowthenix.config.AppConstants.ANSWERS_URL;
 import static io.dpopkov.knowthenix.config.AppConstants.QUESTIONS_ANSWERS_URL;
+import static io.dpopkov.knowthenix.shared.Utils.idIsMissing;
 
 @RestController
 public class AnswerController {
@@ -49,5 +52,22 @@ public class AnswerController {
     public ResponseEntity<List<TranslationDto>> getTranslationsByAnswerId(@PathVariable("answerId") Long answerId) {
         List<TranslationDto> translations = answerService.getTranslations(answerId);
         return new ResponseEntity<>(translations, HttpStatus.OK);
+    }
+
+    @PostMapping(ANSWERS_URL + "/{answerId}/translations")
+    public ResponseEntity<TranslationDto> addTranslation(@PathVariable("answerId") Long answerId,
+                                                         @RequestBody TranslationDto translation) {
+        TranslationDto created = answerService.addTranslation(answerId, translation);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
+
+    @PutMapping(ANSWERS_URL + "/{answerId}/translations")
+    public ResponseEntity<TranslationDto> updateTranslation(@PathVariable("answerId") Long answerId,
+                                                            @RequestBody TranslationDto translation) {
+        if (idIsMissing(translation)) {
+            throw new AppControllerException(ErrorMessages.MISSING_ID);
+        }
+        TranslationDto updated = answerService.updateTranslation(answerId, translation);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 }

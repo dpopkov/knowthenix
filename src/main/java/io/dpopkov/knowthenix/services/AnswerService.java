@@ -10,4 +10,8 @@ public interface AnswerService extends BaseService<AnswerDto> {
     List<AnswerDto> getAllForQuestion(Long questionId);
 
     List<TranslationDto> getTranslations(Long answerId);
+
+    TranslationDto addTranslation(Long answerId, TranslationDto translation);
+
+    TranslationDto updateTranslation(Long answerId, TranslationDto translation);
 }

@@ -4,6 +4,7 @@ import io.dpopkov.knowthenix.domain.entities.answer.AnswerEntity;
 import io.dpopkov.knowthenix.domain.entities.answer.AnswerTextEntity;
 import io.dpopkov.knowthenix.domain.entities.answer.SourceEntity;
 import io.dpopkov.knowthenix.domain.repositories.AnswerRepository;
+import io.dpopkov.knowthenix.domain.repositories.AnswerTextRepository;
 import io.dpopkov.knowthenix.domain.repositories.SourceRepository;
 import io.dpopkov.knowthenix.services.AnswerService;
 import io.dpopkov.knowthenix.services.AppServiceException;
@@ -12,7 +13,9 @@ import io.dpopkov.knowthenix.services.dto.TranslationDto;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerDtoToEntity;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerEntityToDto;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerTextEntityToDto;
+import io.dpopkov.knowthenix.services.dto.converters.TranslationDtoToAnswerTextEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,14 +30,19 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerDtoToEntity answerDtoToEntity;
     private final AnswerEntityToDto answerEntityToDto;
     private final AnswerTextEntityToDto answerTextEntityToDto;
+    private final TranslationDtoToAnswerTextEntity translationDtoToAnswerTextEntity;
+    private final AnswerTextRepository answerTextRepository;
     private final SourceRepository sourceRepository;
 
     public AnswerServiceImpl(AnswerRepository answerRepository, AnswerDtoToEntity answerDtoToEntity,
-                             AnswerEntityToDto answerEntityToDto, AnswerTextEntityToDto answerTextEntityToDto, SourceRepository sourceRepository) {
+                             AnswerEntityToDto answerEntityToDto, AnswerTextEntityToDto answerTextEntityToDto,
+                             TranslationDtoToAnswerTextEntity translationDtoToAnswerTextEntity, AnswerTextRepository answerTextRepository, SourceRepository sourceRepository) {
         this.answerRepository = answerRepository;
         this.answerDtoToEntity = answerDtoToEntity;
         this.answerEntityToDto = answerEntityToDto;
         this.answerTextEntityToDto = answerTextEntityToDto;
+        this.translationDtoToAnswerTextEntity = translationDtoToAnswerTextEntity;
+        this.answerTextRepository = answerTextRepository;
         this.sourceRepository = sourceRepository;
     }
 
@@ -108,5 +116,30 @@ public class AnswerServiceImpl implements AnswerService {
         List<TranslationDto> result = new ArrayList<>();
         values.forEach(textEntity -> result.add(answerTextEntityToDto.convert(textEntity)));
         return result;
+    }
+
+    @Transactional
+    @Override
+    public TranslationDto addTranslation(Long answerId, TranslationDto translation) {
+        AnswerEntity answer = answerRepository.findById(answerId)
+                .orElseThrow(() -> new AppServiceException("Cannot find answer by ID to add translation"));
+        AnswerTextEntity textEntity = translationDtoToAnswerTextEntity.convert(translation);
+        AnswerTextEntity savedTextEntity = answerTextRepository.save(textEntity);
+        answer.addTranslation(savedTextEntity);
+        answerRepository.save(answer);
+        return answerTextEntityToDto.convert(savedTextEntity);
+    }
+
+    @Override
+    public TranslationDto updateTranslation(Long answerId, TranslationDto translation) {
+        if (!answerRepository.existsById(answerId)) {
+            throw new AppServiceException("Cannot find answer by ID to update translation");
+        }
+        AnswerTextEntity textEntity = answerTextRepository.findById(translation.getId())
+                .orElseThrow(() -> new AppServiceException("Cannot find AnswerTextEntity by ID"));
+        AnswerTextEntity data = translationDtoToAnswerTextEntity.convert(translation);
+        textEntity.copyFrom(data);
+        AnswerTextEntity updated = answerTextRepository.save(textEntity);
+        return answerTextEntityToDto.convert(updated);
     }
 }
