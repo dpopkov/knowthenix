@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotEmpty;
 
@@ -14,6 +15,7 @@ import javax.validation.constraints.NotEmpty;
 public class KeyTermEntity extends ModifiableEntity {
 
     @NotEmpty
+    @Column(nullable = false, unique = true)
     private String name;
     private String description;
 

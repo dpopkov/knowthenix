@@ -4,6 +4,7 @@ import io.dpopkov.knowthenix.domain.entities.ModifiableEntity;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotEmpty;
 
@@ -13,6 +14,7 @@ import javax.validation.constraints.NotEmpty;
 public class CategoryEntity extends ModifiableEntity {
 
     @NotEmpty
+    @Column(nullable = false, unique = true)
     private String name;
     private String description;
 

@@ -5,6 +5,7 @@ import io.dpopkov.knowthenix.domain.enums.SourceType;
 import lombok.*;
 import org.springframework.lang.Nullable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -20,6 +21,7 @@ import javax.validation.constraints.NotNull;
 public class SourceEntity extends ModifiableEntity {
 
     @NotEmpty
+    @Column(nullable = false, unique = true)
     private String name;
     private String fullTitle;
     private String url;
