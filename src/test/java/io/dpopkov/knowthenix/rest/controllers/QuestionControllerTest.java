@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import io.dpopkov.knowthenix.rest.exceptions.AppControllerException;
 import io.dpopkov.knowthenix.services.QuestionService;
 import io.dpopkov.knowthenix.services.dto.CategoryDto;
+import io.dpopkov.knowthenix.services.dto.KeyTermDto;
 import io.dpopkov.knowthenix.services.dto.QuestionDto;
 import io.dpopkov.knowthenix.services.dto.TranslationDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.util.List;
 
 import static io.dpopkov.knowthenix.config.AppConstants.QUESTIONS_URL;
 import static org.junit.jupiter.api.Assertions.*;
@@ -165,5 +168,17 @@ class QuestionControllerTest {
         )
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof AppControllerException));
+    }
+
+    @Test
+    void getKeyTerms() throws Exception {
+        // Given
+        given(questionService.getKeyTermsByQuestionId(ID_1)).willReturn(List.of(new KeyTermDto("1", "")));
+        // When
+        mockMvc.perform(get(QUESTIONS_URL + "/" + ID_1 + "/keyterms"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON));
+        // Then
+        then(questionService).should().getKeyTermsByQuestionId(ID_1);
     }
 }

@@ -1,5 +1,6 @@
 package io.dpopkov.knowthenix.services.impl;
 
+import io.dpopkov.knowthenix.domain.entities.KeyTermEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionTextEntity;
 import io.dpopkov.knowthenix.domain.enums.Language;
@@ -7,6 +8,7 @@ import io.dpopkov.knowthenix.domain.repositories.QuestionRepository;
 import io.dpopkov.knowthenix.domain.repositories.QuestionTextRepository;
 import io.dpopkov.knowthenix.services.AppServiceException;
 import io.dpopkov.knowthenix.services.dto.CategoryDto;
+import io.dpopkov.knowthenix.services.dto.KeyTermDto;
 import io.dpopkov.knowthenix.services.dto.QuestionDto;
 import io.dpopkov.knowthenix.services.dto.TranslationDto;
 import io.dpopkov.knowthenix.services.dto.converters.*;
@@ -18,13 +20,12 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class QuestionServiceImplTest {
@@ -187,5 +188,19 @@ class QuestionServiceImplTest {
         toUpdate.setId(TRANSLATION_ID_1);
         // When/Then
         assertThrows(AppServiceException.class, () -> service.updateTranslation(ID_1, toUpdate));
+    }
+
+    @Test
+    void getKeyTermsByQuestionId() {
+        // Given
+        QuestionEntity question = new QuestionEntity();
+        question.addKeyTerm(new KeyTermEntity("1", ""));
+        question.addKeyTerm(new KeyTermEntity("2", ""));
+        given(questionRepository.findById(ID_1)).willReturn(Optional.of(question));
+        // When
+        Collection<KeyTermDto> keyTerms = service.getKeyTermsByQuestionId(ID_1);
+        // Then
+        then(questionRepository).should().findById(ID_1);
+        assertEquals(2, keyTerms.size());
     }
 }

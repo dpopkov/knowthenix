@@ -1,11 +1,13 @@
 package io.dpopkov.knowthenix.services.impl;
 
+import io.dpopkov.knowthenix.domain.entities.KeyTermEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionTextEntity;
 import io.dpopkov.knowthenix.domain.repositories.QuestionRepository;
 import io.dpopkov.knowthenix.domain.repositories.QuestionTextRepository;
 import io.dpopkov.knowthenix.services.AppServiceException;
 import io.dpopkov.knowthenix.services.QuestionService;
+import io.dpopkov.knowthenix.services.dto.KeyTermDto;
 import io.dpopkov.knowthenix.services.dto.QuestionDto;
 import io.dpopkov.knowthenix.services.dto.TranslationDto;
 import io.dpopkov.knowthenix.services.dto.converters.QuestionDtoToEntity;
@@ -13,6 +15,7 @@ import io.dpopkov.knowthenix.services.dto.converters.QuestionEntityToDto;
 import io.dpopkov.knowthenix.services.dto.converters.QuestionTextEntityToDto;
 import io.dpopkov.knowthenix.services.dto.converters.TranslationDtoToQuestionTextEntity;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -113,5 +116,16 @@ public class QuestionServiceImpl implements QuestionService {
         textEntity.copyFrom(data);
         QuestionTextEntity updated = questionTextRepository.save(textEntity);
         return questionTextEntityToDto.convert(updated);
+    }
+
+    @Override
+    public Collection<KeyTermDto> getKeyTermsByQuestionId(Long questionId) {
+        QuestionEntity questionEntity = questionRepository.findById(questionId)
+                .orElseThrow(() -> new AppServiceException("Cannot find question by ID to get keyterms"));
+        Collection<KeyTermEntity> entities = questionEntity.getKeyTerms();
+        Collection<KeyTermDto> result = new ArrayList<>();
+        final ModelMapper mapper = new ModelMapper();
+        entities.forEach(e -> result.add(mapper.map(e, KeyTermDto.class)));
+        return result;
     }
 }

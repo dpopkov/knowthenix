@@ -48,14 +48,21 @@ public class DataInitialization {
 
         log.debug("initData saved {} categories", categoryRepository.count());
 
+        KeyTermEntity keyTermSpring = new KeyTermEntity("Spring", "Spring framework");
+        keyTermRepository.save(keyTermSpring);
         KeyTermEntity keyTermSpring5 = new KeyTermEntity("Spring 5", "Spring framework version 5");
         keyTermRepository.save(keyTermSpring5);
         KeyTermEntity keyTermSpring6 = new KeyTermEntity("Spring 6", "Spring framework version 6");
         keyTermRepository.save(keyTermSpring6);
+        KeyTermEntity keyTermHibernate = new KeyTermEntity("Hibernate", "ORM framework for Java");
+        keyTermRepository.save(keyTermHibernate);
+        KeyTermEntity keyTermOrm = new KeyTermEntity("ORM", "Object-Relational Mapping");
+        keyTermRepository.save(keyTermOrm);
 
         log.debug("initData saved {} key terms", keyTermRepository.count());
 
         QuestionEntity spring = new QuestionEntity();
+        spring.addKeyTerm(keyTermSpring);
         QuestionTextEntity springEn = new QuestionTextEntity(Language.EN, "What is Spring?");
         QuestionTextEntity springRu = new QuestionTextEntity(Language.RU, "Что такое Spring?");
         spring.addTranslation(springEn);
@@ -63,6 +70,8 @@ public class DataInitialization {
         spring.setCategory(categorySpring);
         questionRepository.save(spring);
         QuestionEntity hibernate = new QuestionEntity();
+        hibernate.addKeyTerm(keyTermHibernate);
+        hibernate.addKeyTerm(keyTermOrm);
         QuestionTextEntity hibernateEn = new QuestionTextEntity(Language.EN, "What is Hibernate?");
         QuestionTextEntity hibernateRu = new QuestionTextEntity(Language.RU, "Что такое Hibernate?");
         hibernate.addTranslation(hibernateEn);
