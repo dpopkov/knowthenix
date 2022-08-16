@@ -3,10 +3,12 @@ package io.dpopkov.knowthenix.services.impl;
 import io.dpopkov.knowthenix.domain.entities.KeyTermEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionTextEntity;
+import io.dpopkov.knowthenix.domain.repositories.KeyTermRepository;
 import io.dpopkov.knowthenix.domain.repositories.QuestionRepository;
 import io.dpopkov.knowthenix.domain.repositories.QuestionTextRepository;
 import io.dpopkov.knowthenix.services.AppServiceException;
 import io.dpopkov.knowthenix.services.QuestionService;
+import io.dpopkov.knowthenix.services.dto.IdChangeSetDto;
 import io.dpopkov.knowthenix.services.dto.KeyTermDto;
 import io.dpopkov.knowthenix.services.dto.QuestionDto;
 import io.dpopkov.knowthenix.services.dto.TranslationDto;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -33,14 +36,16 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionDtoToEntity questionDtoToEntity;
     private final TranslationDtoToQuestionTextEntity translationDtoToQuestionTextEntity;
     private final QuestionTextEntityToDto questionTextEntityToDto;
+    private final KeyTermRepository keyTermRepository;
 
-    public QuestionServiceImpl(QuestionRepository questionRepository, QuestionTextRepository questionTextRepository, QuestionEntityToDto questionEntityToDto, QuestionDtoToEntity questionDtoToEntity, TranslationDtoToQuestionTextEntity translationDtoToQuestionTextEntity, QuestionTextEntityToDto questionTextEntityToDto) {
+    public QuestionServiceImpl(QuestionRepository questionRepository, QuestionTextRepository questionTextRepository, QuestionEntityToDto questionEntityToDto, QuestionDtoToEntity questionDtoToEntity, TranslationDtoToQuestionTextEntity translationDtoToQuestionTextEntity, QuestionTextEntityToDto questionTextEntityToDto, KeyTermRepository keyTermRepository) {
         this.questionRepository = questionRepository;
         this.questionTextRepository = questionTextRepository;
         this.questionEntityToDto = questionEntityToDto;
         this.questionDtoToEntity = questionDtoToEntity;
         this.translationDtoToQuestionTextEntity = translationDtoToQuestionTextEntity;
         this.questionTextEntityToDto = questionTextEntityToDto;
+        this.keyTermRepository = keyTermRepository;
     }
 
     @Override
@@ -126,6 +131,25 @@ public class QuestionServiceImpl implements QuestionService {
         Collection<KeyTermDto> result = new ArrayList<>();
         final ModelMapper mapper = new ModelMapper();
         entities.forEach(e -> result.add(mapper.map(e, KeyTermDto.class)));
+        return result;
+    }
+
+    @Transactional
+    @Override
+    public Collection<Long> changeKeyTermsByQuestionId(Long questionId, IdChangeSetDto idChangeSetDto) {
+        QuestionEntity questionEntity = questionRepository.findById(questionId)
+                .orElseThrow(() -> new AppServiceException("Cannot find question by ID to change keyterms"));
+        idChangeSetDto.getAdd().forEach(keyTermId -> {
+            Optional<KeyTermEntity> byId = keyTermRepository.findById(keyTermId);
+            byId.ifPresent(questionEntity::addKeyTerm);
+        });
+        idChangeSetDto.getRemove().forEach(keyTermId -> {
+            Optional<KeyTermEntity> byId = keyTermRepository.findById(keyTermId);
+            byId.ifPresent(keyTermEntity -> questionEntity.getKeyTerms().remove(keyTermEntity));
+        });
+        questionRepository.save(questionEntity);
+        Collection<Long> result = new ArrayList<>();
+        questionEntity.getKeyTerms().forEach(kt -> result.add(kt.getId()));
         return result;
     }
 }

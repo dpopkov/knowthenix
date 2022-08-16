@@ -4,13 +4,11 @@ import io.dpopkov.knowthenix.domain.entities.KeyTermEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionTextEntity;
 import io.dpopkov.knowthenix.domain.enums.Language;
+import io.dpopkov.knowthenix.domain.repositories.KeyTermRepository;
 import io.dpopkov.knowthenix.domain.repositories.QuestionRepository;
 import io.dpopkov.knowthenix.domain.repositories.QuestionTextRepository;
 import io.dpopkov.knowthenix.services.AppServiceException;
-import io.dpopkov.knowthenix.services.dto.CategoryDto;
-import io.dpopkov.knowthenix.services.dto.KeyTermDto;
-import io.dpopkov.knowthenix.services.dto.QuestionDto;
-import io.dpopkov.knowthenix.services.dto.TranslationDto;
+import io.dpopkov.knowthenix.services.dto.*;
 import io.dpopkov.knowthenix.services.dto.converters.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,11 +31,15 @@ class QuestionServiceImplTest {
     private static final Long ID_1 = 10L;
     private static final Long ID_2 = 11L;
     private static final Long TRANSLATION_ID_1 = 111L;
+    private static final Long KEY_TERM_ID_1 = 1234L;
+    private static final Long KEY_TERM_ID_2 = 1235L;
 
     @Mock
     QuestionRepository questionRepository;
     @Mock
     QuestionTextRepository questionTextRepository;
+    @Mock
+    KeyTermRepository keyTermRepository;
     QuestionServiceImpl service;
     @Captor
     ArgumentCaptor<QuestionEntity> questionEntityCaptor;
@@ -48,7 +50,7 @@ class QuestionServiceImplTest {
                 new CategoryDtoToEntity(), new TranslationDtoToQuestionTextEntity());
         service = new QuestionServiceImpl(questionRepository, questionTextRepository,
                 new QuestionEntityToDto(new CategoryEntityToDto(), new QuestionTextEntityToDto()), questionDtoToEntity,
-                new TranslationDtoToQuestionTextEntity(), new QuestionTextEntityToDto());
+                new TranslationDtoToQuestionTextEntity(), new QuestionTextEntityToDto(), keyTermRepository);
     }
 
     @Test
@@ -202,5 +204,21 @@ class QuestionServiceImplTest {
         // Then
         then(questionRepository).should().findById(ID_1);
         assertEquals(2, keyTerms.size());
+    }
+
+    @Test
+    void changeKeyTermsByQuestionId() {
+        // Given
+        IdChangeSetDto dto = new IdChangeSetDto();
+        dto.getAdd().add(KEY_TERM_ID_1);
+        dto.getRemove().add(KEY_TERM_ID_2);
+        when(questionRepository.findById(ID_1)).thenReturn(Optional.of(new QuestionEntity()));
+        // When
+        service.changeKeyTermsByQuestionId(ID_1, dto);
+        // Then
+        then(questionRepository).should().findById(ID_1);
+        then(keyTermRepository).should().findById(KEY_TERM_ID_1);
+        then(keyTermRepository).should().findById(KEY_TERM_ID_2);
+        then(questionRepository).should().save(any(QuestionEntity.class));
     }
 }

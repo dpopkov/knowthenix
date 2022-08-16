@@ -3,10 +3,7 @@ package io.dpopkov.knowthenix.rest.controllers;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import io.dpopkov.knowthenix.rest.exceptions.AppControllerException;
 import io.dpopkov.knowthenix.services.QuestionService;
-import io.dpopkov.knowthenix.services.dto.CategoryDto;
-import io.dpopkov.knowthenix.services.dto.KeyTermDto;
-import io.dpopkov.knowthenix.services.dto.QuestionDto;
-import io.dpopkov.knowthenix.services.dto.TranslationDto;
+import io.dpopkov.knowthenix.services.dto.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +33,8 @@ class QuestionControllerTest {
 
     private static final Long ID_1 = 12L;
     private static final Long TRANSLATION_ID = 123L;
+    private static final Long KEY_TERM_ID_1 = 1234L;
+    private static final Long KEY_TERM_ID_2 = 1235L;
 
     private final JsonMapper mapper = new JsonMapper();
     @Mock
@@ -46,6 +45,10 @@ class QuestionControllerTest {
     ArgumentCaptor<QuestionDto> dtoCaptor;
     @Captor
     ArgumentCaptor<Long> questionIdCaptor;
+    @Captor
+    ArgumentCaptor<IdChangeSetDto> changeSetCaptor;
+    @Captor
+    ArgumentCaptor<Long> idCaptor;
     MockMvc mockMvc;
 
     @BeforeEach
@@ -180,5 +183,26 @@ class QuestionControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON));
         // Then
         then(questionService).should().getKeyTermsByQuestionId(ID_1);
+    }
+
+    @Test
+    void changeKeyTerms() throws Exception {
+        // Given
+        IdChangeSetDto dto = new IdChangeSetDto();
+        dto.getAdd().add(KEY_TERM_ID_1);
+        dto.getRemove().add(KEY_TERM_ID_2);
+        String patchJson = mapper.writeValueAsString(dto);
+        // When
+        mockMvc.perform(patch(QUESTIONS_URL + "/" + ID_1 + "/keyterms")
+                .contentType(APPLICATION_JSON)
+                .content(patchJson)
+        )
+                .andExpect(status().isOk());
+        // Then
+        then(questionService).should().changeKeyTermsByQuestionId(idCaptor.capture(), changeSetCaptor.capture());
+        assertEquals(ID_1, idCaptor.getValue());
+        IdChangeSetDto captured = changeSetCaptor.getValue();
+        assertEquals(KEY_TERM_ID_1, captured.getAdd().get(0));
+        assertEquals(KEY_TERM_ID_2, captured.getRemove().get(0));
     }
 }

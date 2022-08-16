@@ -3,6 +3,7 @@ package io.dpopkov.knowthenix.rest.controllers;
 import io.dpopkov.knowthenix.rest.exceptions.AppControllerException;
 import io.dpopkov.knowthenix.rest.model.response.ErrorMessages;
 import io.dpopkov.knowthenix.services.QuestionService;
+import io.dpopkov.knowthenix.services.dto.IdChangeSetDto;
 import io.dpopkov.knowthenix.services.dto.KeyTermDto;
 import io.dpopkov.knowthenix.services.dto.QuestionDto;
 import io.dpopkov.knowthenix.services.dto.TranslationDto;
@@ -79,5 +80,12 @@ public class QuestionController {
     public ResponseEntity<Collection<KeyTermDto>> getKeyTerms(@PathVariable("questionId") Long questionId) {
         Collection<KeyTermDto> keyTerms = questionService.getKeyTermsByQuestionId(questionId);
         return new ResponseEntity<>(keyTerms, HttpStatus.OK);
+    }
+
+    @PatchMapping("/{questionId}/keyterms")
+    public ResponseEntity<Collection<Long>> changeKeyTerms(@PathVariable("questionId") Long questionId,
+                               @RequestBody IdChangeSetDto idChangeSetDto) {
+        Collection<Long> ids = questionService.changeKeyTermsByQuestionId(questionId, idChangeSetDto);
+        return new ResponseEntity<>(ids, HttpStatus.OK);
     }
 }
