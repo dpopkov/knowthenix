@@ -4,11 +4,13 @@ import io.dpopkov.knowthenix.rest.exceptions.AppControllerException;
 import io.dpopkov.knowthenix.rest.model.response.ErrorMessages;
 import io.dpopkov.knowthenix.services.AnswerService;
 import io.dpopkov.knowthenix.services.dto.AnswerDto;
+import io.dpopkov.knowthenix.services.dto.KeyTermDto;
 import io.dpopkov.knowthenix.services.dto.TranslationDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 
 import static io.dpopkov.knowthenix.config.AppConstants.ANSWERS_URL;
@@ -69,5 +71,11 @@ public class AnswerController {
         }
         TranslationDto updated = answerService.updateTranslation(answerId, translation);
         return new ResponseEntity<>(updated, HttpStatus.OK);
+    }
+
+    @GetMapping(ANSWERS_URL + "/{answerId}/keyterms")
+    public ResponseEntity<Collection<KeyTermDto>> getKeyTerms(@PathVariable("answerId") Long answerId) {
+        Collection<KeyTermDto> keyTerms = answerService.getKeyTermsByAnswerId(answerId);
+        return new ResponseEntity<>(keyTerms, HttpStatus.OK);
     }
 }

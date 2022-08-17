@@ -1,5 +1,6 @@
 package io.dpopkov.knowthenix.services.impl;
 
+import io.dpopkov.knowthenix.domain.entities.KeyTermEntity;
 import io.dpopkov.knowthenix.domain.entities.answer.AnswerEntity;
 import io.dpopkov.knowthenix.domain.entities.answer.SourceEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionEntity;
@@ -8,6 +9,7 @@ import io.dpopkov.knowthenix.domain.repositories.AnswerRepository;
 import io.dpopkov.knowthenix.domain.repositories.AnswerTextRepository;
 import io.dpopkov.knowthenix.domain.repositories.SourceRepository;
 import io.dpopkov.knowthenix.services.dto.AnswerDto;
+import io.dpopkov.knowthenix.services.dto.KeyTermDto;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerDtoToEntity;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerEntityToDto;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerTextEntityToDto;
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -155,5 +158,19 @@ class AnswerServiceImplTest {
         // Given
         // When
         // Then
+    }
+
+    @Test
+    void getKeyTermsByAnswerId() {
+        // Given
+        AnswerEntity answer = new AnswerEntity();
+        answer.addKeyTerm(new KeyTermEntity("1", ""));
+        answer.addKeyTerm(new KeyTermEntity("2", ""));
+        given(answerRepository.findById(ANSWER_ID)).willReturn(Optional.of(answer));
+        // When
+        Collection<KeyTermDto> keyterms = service.getKeyTermsByAnswerId(ANSWER_ID);
+        // Then
+        then(answerRepository).should().findById(ANSWER_ID);
+        assertEquals(2, keyterms.size());
     }
 }

@@ -1,5 +1,6 @@
 package io.dpopkov.knowthenix.services.impl;
 
+import io.dpopkov.knowthenix.domain.entities.KeyTermEntity;
 import io.dpopkov.knowthenix.domain.entities.answer.AnswerEntity;
 import io.dpopkov.knowthenix.domain.entities.answer.AnswerTextEntity;
 import io.dpopkov.knowthenix.domain.entities.answer.SourceEntity;
@@ -9,11 +10,13 @@ import io.dpopkov.knowthenix.domain.repositories.SourceRepository;
 import io.dpopkov.knowthenix.services.AnswerService;
 import io.dpopkov.knowthenix.services.AppServiceException;
 import io.dpopkov.knowthenix.services.dto.AnswerDto;
+import io.dpopkov.knowthenix.services.dto.KeyTermDto;
 import io.dpopkov.knowthenix.services.dto.TranslationDto;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerDtoToEntity;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerEntityToDto;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerTextEntityToDto;
 import io.dpopkov.knowthenix.services.dto.converters.TranslationDtoToAnswerTextEntity;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static io.dpopkov.knowthenix.shared.Utils.*;
+import static io.dpopkov.knowthenix.shared.Utils.anyIdIsMissing;
 
 @Service
 public class AnswerServiceImpl implements AnswerService {
@@ -141,5 +144,16 @@ public class AnswerServiceImpl implements AnswerService {
         textEntity.copyFrom(data);
         AnswerTextEntity updated = answerTextRepository.save(textEntity);
         return answerTextEntityToDto.convert(updated);
+    }
+
+    @Override
+    public Collection<KeyTermDto> getKeyTermsByAnswerId(Long answerId) {
+        AnswerEntity answerEntity = answerRepository.findById(answerId)
+                .orElseThrow(() -> new AppServiceException("Cannot find answer by ID to get keyterms"));
+        Collection<KeyTermEntity> entities = answerEntity.getKeyTerms();
+        Collection<KeyTermDto> result = new ArrayList<>();
+        ModelMapper mapper = new ModelMapper();
+        entities.forEach(e -> result.add(mapper.map(e, KeyTermDto.class)));
+        return result;
     }
 }

@@ -58,6 +58,8 @@ public class DataInitialization {
         keyTermRepository.save(keyTermHibernate);
         KeyTermEntity keyTermOrm = new KeyTermEntity("ORM", "Object-Relational Mapping");
         keyTermRepository.save(keyTermOrm);
+        KeyTermEntity keyTermSwing = new KeyTermEntity("Swing", "Java GUI library");
+        keyTermRepository.save(keyTermSwing);
 
         log.debug("initData saved {} key terms", keyTermRepository.count());
 
@@ -102,6 +104,8 @@ public class DataInitialization {
                 "Spring is the framework that will help you achieve your goals"));
         springAnswer.addTranslation(new AnswerTextEntity(Language.RU,
                 "Spring это фреймворк, который поможет вам достичь ваших целей"));
+        springAnswer.addKeyTerm(keyTermSpring);
+        springAnswer.addKeyTerm(keyTermSpring5);
         answerRepository.save(springAnswer);
 
         AnswerEntity springAnswer2 = new AnswerEntity();
@@ -113,6 +117,7 @@ public class DataInitialization {
                 "Spring is the layout in Swing UI library"));
         springAnswer2.addTranslation(new AnswerTextEntity(Language.RU,
                 "Spring это компонент для размещения контролов при программировании Swing приложений"));
+        springAnswer2.addKeyTerm(keyTermSwing);
         answerRepository.save(springAnswer2);
 
         log.debug("initData saved {} answers", answerRepository.count());

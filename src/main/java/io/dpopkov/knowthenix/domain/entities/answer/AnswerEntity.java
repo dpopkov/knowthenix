@@ -1,5 +1,6 @@
 package io.dpopkov.knowthenix.domain.entities.answer;
 
+import io.dpopkov.knowthenix.domain.entities.KeyTermEntity;
 import io.dpopkov.knowthenix.domain.entities.ModifiableEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionEntity;
 import io.dpopkov.knowthenix.domain.enums.Language;
@@ -10,7 +11,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -35,7 +38,17 @@ public class AnswerEntity extends ModifiableEntity {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private Map<Language, AnswerTextEntity> translations = new HashMap<>();
 
+    @ManyToMany
+    @JoinTable(name = "answer_keyterm",
+            joinColumns = @JoinColumn(name = "answer_id"),
+            inverseJoinColumns = @JoinColumn(name = "keyterm_id"))
+    private Set<KeyTermEntity> keyTerms = new HashSet<>();
+
     public void addTranslation(AnswerTextEntity translation) {
         translations.put(translation.getLanguage(), translation);
+    }
+
+    public void addKeyTerm(KeyTermEntity keyTerm) {
+        this.keyTerms.add(keyTerm);
     }
 }
