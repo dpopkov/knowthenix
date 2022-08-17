@@ -7,8 +7,10 @@ import io.dpopkov.knowthenix.domain.entities.question.QuestionEntity;
 import io.dpopkov.knowthenix.domain.enums.Language;
 import io.dpopkov.knowthenix.domain.repositories.AnswerRepository;
 import io.dpopkov.knowthenix.domain.repositories.AnswerTextRepository;
+import io.dpopkov.knowthenix.domain.repositories.KeyTermRepository;
 import io.dpopkov.knowthenix.domain.repositories.SourceRepository;
 import io.dpopkov.knowthenix.services.dto.AnswerDto;
+import io.dpopkov.knowthenix.services.dto.IdChangeSetDto;
 import io.dpopkov.knowthenix.services.dto.KeyTermDto;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerDtoToEntity;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerEntityToDto;
@@ -33,6 +35,8 @@ class AnswerServiceImplTest {
     private static final Long ANSWER_ID = 11L;
     private static final Long QUESTION_ID = 21L;
     private static final Long SOURCE_ID = 31L;
+    private static final Long KEY_TERM_ID_1 = 1234L;
+    private static final Long KEY_TERM_ID_2 = 1235L;
 
     @Mock
     AnswerRepository answerRepository;
@@ -40,6 +44,8 @@ class AnswerServiceImplTest {
     SourceRepository sourceRepository;
     @Mock
     AnswerTextRepository answerTextRepository;
+    @Mock
+    KeyTermRepository keyTermRepository;
     AnswerServiceImpl service;
     @Captor
     ArgumentCaptor<AnswerEntity> answerCaptor;
@@ -49,7 +55,7 @@ class AnswerServiceImplTest {
         service = new AnswerServiceImpl(answerRepository,
                 new AnswerDtoToEntity(new TranslationDtoToAnswerTextEntity()),
                 new AnswerEntityToDto(new AnswerTextEntityToDto()), new AnswerTextEntityToDto(),
-                new TranslationDtoToAnswerTextEntity(), answerTextRepository, sourceRepository);
+                new TranslationDtoToAnswerTextEntity(), answerTextRepository, sourceRepository, keyTermRepository);
     }
 
     @Test
@@ -172,5 +178,21 @@ class AnswerServiceImplTest {
         // Then
         then(answerRepository).should().findById(ANSWER_ID);
         assertEquals(2, keyterms.size());
+    }
+
+    @Test
+    void changeKeyTermsByAnswerId() {
+        // Given
+        IdChangeSetDto dto = new IdChangeSetDto();
+        dto.getAdd().add(KEY_TERM_ID_1);
+        dto.getRemove().add(KEY_TERM_ID_2);
+        when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.of(new AnswerEntity()));
+        // When
+        service.changeKeyTermsByAnswerId(ANSWER_ID, dto);
+        // Then
+        then(answerRepository).should().findById(ANSWER_ID);
+        then(keyTermRepository).should().findById(KEY_TERM_ID_1);
+        then(keyTermRepository).should().findById(KEY_TERM_ID_2);
+        then(answerRepository).should().save(any(AnswerEntity.class));
     }
 }

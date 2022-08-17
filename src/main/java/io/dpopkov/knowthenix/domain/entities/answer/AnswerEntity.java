@@ -51,4 +51,8 @@ public class AnswerEntity extends ModifiableEntity {
     public void addKeyTerm(KeyTermEntity keyTerm) {
         this.keyTerms.add(keyTerm);
     }
+
+    public void removeKeyTerm(KeyTermEntity keyTerm) {
+        this.keyTerms.remove(keyTerm);
+    }
 }

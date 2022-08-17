@@ -4,6 +4,7 @@ import io.dpopkov.knowthenix.rest.exceptions.AppControllerException;
 import io.dpopkov.knowthenix.rest.model.response.ErrorMessages;
 import io.dpopkov.knowthenix.services.AnswerService;
 import io.dpopkov.knowthenix.services.dto.AnswerDto;
+import io.dpopkov.knowthenix.services.dto.IdChangeSetDto;
 import io.dpopkov.knowthenix.services.dto.KeyTermDto;
 import io.dpopkov.knowthenix.services.dto.TranslationDto;
 import org.springframework.http.HttpStatus;
@@ -77,5 +78,12 @@ public class AnswerController {
     public ResponseEntity<Collection<KeyTermDto>> getKeyTerms(@PathVariable("answerId") Long answerId) {
         Collection<KeyTermDto> keyTerms = answerService.getKeyTermsByAnswerId(answerId);
         return new ResponseEntity<>(keyTerms, HttpStatus.OK);
+    }
+
+    @PatchMapping(ANSWERS_URL + "/{answerId}/keyterms")
+    public ResponseEntity<Collection<Long>> changeKeyTerms(@PathVariable("answerId") Long answerId,
+                                                           @RequestBody IdChangeSetDto idChangeSetDto) {
+        Collection<Long> ids = answerService.changeKeyTermsByAnswerId(answerId, idChangeSetDto);
+        return new ResponseEntity<>(ids, HttpStatus.OK);
     }
 }

@@ -6,10 +6,12 @@ import io.dpopkov.knowthenix.domain.entities.answer.AnswerTextEntity;
 import io.dpopkov.knowthenix.domain.entities.answer.SourceEntity;
 import io.dpopkov.knowthenix.domain.repositories.AnswerRepository;
 import io.dpopkov.knowthenix.domain.repositories.AnswerTextRepository;
+import io.dpopkov.knowthenix.domain.repositories.KeyTermRepository;
 import io.dpopkov.knowthenix.domain.repositories.SourceRepository;
 import io.dpopkov.knowthenix.services.AnswerService;
 import io.dpopkov.knowthenix.services.AppServiceException;
 import io.dpopkov.knowthenix.services.dto.AnswerDto;
+import io.dpopkov.knowthenix.services.dto.IdChangeSetDto;
 import io.dpopkov.knowthenix.services.dto.KeyTermDto;
 import io.dpopkov.knowthenix.services.dto.TranslationDto;
 import io.dpopkov.knowthenix.services.dto.converters.AnswerDtoToEntity;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static io.dpopkov.knowthenix.shared.Utils.anyIdIsMissing;
 
@@ -36,10 +39,11 @@ public class AnswerServiceImpl implements AnswerService {
     private final TranslationDtoToAnswerTextEntity translationDtoToAnswerTextEntity;
     private final AnswerTextRepository answerTextRepository;
     private final SourceRepository sourceRepository;
+    private final KeyTermRepository keyTermRepository;
 
     public AnswerServiceImpl(AnswerRepository answerRepository, AnswerDtoToEntity answerDtoToEntity,
                              AnswerEntityToDto answerEntityToDto, AnswerTextEntityToDto answerTextEntityToDto,
-                             TranslationDtoToAnswerTextEntity translationDtoToAnswerTextEntity, AnswerTextRepository answerTextRepository, SourceRepository sourceRepository) {
+                             TranslationDtoToAnswerTextEntity translationDtoToAnswerTextEntity, AnswerTextRepository answerTextRepository, SourceRepository sourceRepository, KeyTermRepository keyTermRepository) {
         this.answerRepository = answerRepository;
         this.answerDtoToEntity = answerDtoToEntity;
         this.answerEntityToDto = answerEntityToDto;
@@ -47,6 +51,7 @@ public class AnswerServiceImpl implements AnswerService {
         this.translationDtoToAnswerTextEntity = translationDtoToAnswerTextEntity;
         this.answerTextRepository = answerTextRepository;
         this.sourceRepository = sourceRepository;
+        this.keyTermRepository = keyTermRepository;
     }
 
     @Override
@@ -154,6 +159,24 @@ public class AnswerServiceImpl implements AnswerService {
         Collection<KeyTermDto> result = new ArrayList<>();
         ModelMapper mapper = new ModelMapper();
         entities.forEach(e -> result.add(mapper.map(e, KeyTermDto.class)));
+        return result;
+    }
+
+    @Override
+    public Collection<Long> changeKeyTermsByAnswerId(Long answerId, IdChangeSetDto idChangeSetDto) {
+        AnswerEntity answerEntity = answerRepository.findById(answerId)
+                .orElseThrow(() -> new AppServiceException("Cannot find answer by ID to change keyterms"));
+        idChangeSetDto.getAdd().forEach(keyTermId -> {
+            Optional<KeyTermEntity> byId = keyTermRepository.findById(keyTermId);
+            byId.ifPresent(answerEntity::addKeyTerm);
+        });
+        idChangeSetDto.getRemove().forEach(keyTermId -> {
+            Optional<KeyTermEntity> byId = keyTermRepository.findById(keyTermId);
+            byId.ifPresent(answerEntity::removeKeyTerm);
+        });
+        answerRepository.save(answerEntity);
+        Collection<Long> result = new ArrayList<>();
+        answerEntity.getKeyTerms().forEach(kt -> result.add(kt.getId()));
         return result;
     }
 }

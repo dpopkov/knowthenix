@@ -1,6 +1,7 @@
 package io.dpopkov.knowthenix.services;
 
 import io.dpopkov.knowthenix.services.dto.AnswerDto;
+import io.dpopkov.knowthenix.services.dto.IdChangeSetDto;
 import io.dpopkov.knowthenix.services.dto.KeyTermDto;
 import io.dpopkov.knowthenix.services.dto.TranslationDto;
 
@@ -18,4 +19,6 @@ public interface AnswerService extends BaseService<AnswerDto> {
     TranslationDto updateTranslation(Long answerId, TranslationDto translation);
 
     Collection<KeyTermDto> getKeyTermsByAnswerId(Long answerId);
+
+    Collection<Long> changeKeyTermsByAnswerId(Long answerId, IdChangeSetDto idChangeSetDto);
 }
