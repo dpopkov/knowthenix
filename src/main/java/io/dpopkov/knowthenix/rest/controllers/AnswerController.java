@@ -86,4 +86,10 @@ public class AnswerController {
         Collection<Long> ids = answerService.changeKeyTermsByAnswerId(answerId, idChangeSetDto);
         return new ResponseEntity<>(ids, HttpStatus.OK);
     }
+
+    @DeleteMapping(ANSWERS_URL + "/{answerId}")
+    public ResponseEntity<?> deleteAnswer(@PathVariable("answerId") Long answerId) {
+        answerService.delete(answerId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

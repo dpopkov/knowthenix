@@ -161,9 +161,10 @@ class AnswerServiceImplTest {
 
     @Test
     void delete() {
-        // Given
         // When
+        service.delete(ANSWER_ID);
         // Then
+        then(answerRepository).should().deleteById(ANSWER_ID);
     }
 
     @Test

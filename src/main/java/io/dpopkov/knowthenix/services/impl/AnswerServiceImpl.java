@@ -114,7 +114,7 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public void delete(Long id) {
-
+        answerRepository.deleteById(id);
     }
 
     @Override

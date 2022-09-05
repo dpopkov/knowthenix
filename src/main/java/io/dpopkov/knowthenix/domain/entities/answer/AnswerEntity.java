@@ -35,7 +35,7 @@ public class AnswerEntity extends ModifiableEntity {
     private Language selectedLanguage = Language.EN;
 
     @MapKey(name = "language")
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private Map<Language, AnswerTextEntity> translations = new HashMap<>();
 
     @ManyToMany
