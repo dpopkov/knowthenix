@@ -88,4 +88,9 @@ public class QuestionController {
         Collection<Long> ids = questionService.changeKeyTermsByQuestionId(questionId, idChangeSetDto);
         return new ResponseEntity<>(ids, HttpStatus.OK);
     }
+
+    @GetMapping("/created/{createdOn}")
+    public ResponseEntity<List<QuestionDto>> getQuestionsByCreatedOn(@PathVariable("createdOn") String createdOn) {
+        return new ResponseEntity<>(questionService.getCreatedOn(createdOn), HttpStatus.OK);
+    }
 }

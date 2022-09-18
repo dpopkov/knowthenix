@@ -11,6 +11,7 @@ import java.util.List;
 public class QuestionDto extends BaseDto {
     private CategoryDto category;
     private String selectedLanguage;
+    private String createdAt;
     private List<TranslationDto> translations = new ArrayList<>();
 
     public void addTranslation(TranslationDto translationDto) {

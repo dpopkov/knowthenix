@@ -20,4 +20,6 @@ public interface QuestionService extends BaseService<QuestionDto> {
 
     /** Patches set of Questions's keyterms and returns collection of IDs of updated Question. */
     Collection<Long> changeKeyTermsByQuestionId(Long questionId, IdChangeSetDto idChangeSetDto);
+
+    List<QuestionDto> getCreatedOn(String createdOn);
 }

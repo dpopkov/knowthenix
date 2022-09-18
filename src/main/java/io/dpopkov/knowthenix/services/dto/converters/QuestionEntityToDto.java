@@ -27,6 +27,9 @@ public class QuestionEntityToDto implements Converter<QuestionEntity, QuestionDt
         if (entity.getSelectedLanguage() != null) {
             dto.setSelectedLanguage(entity.getSelectedLanguage().name());
         }
+        if (entity.getCreatedOn() != null) {
+            dto.setCreatedAt(entity.getCreatedOn().toLocalDate().toString());
+        }
         if (entity.getTranslations() != null && !entity.getTranslations().isEmpty()) {
             for (QuestionTextEntity qt : entity.getTranslations().values()) {
                 dto.addTranslation(questionTextEntityToDto.convert(qt));

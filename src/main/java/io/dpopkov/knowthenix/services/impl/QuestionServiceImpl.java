@@ -21,6 +21,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -150,6 +152,16 @@ public class QuestionServiceImpl implements QuestionService {
         questionRepository.save(questionEntity);
         Collection<Long> result = new ArrayList<>();
         questionEntity.getKeyTerms().forEach(kt -> result.add(kt.getId()));
+        return result;
+    }
+
+    @Override
+    public List<QuestionDto> getCreatedOn(String createdOn) {
+        LocalDate on = LocalDate.parse(createdOn);
+        LocalDateTime start = on.atStartOfDay();
+        LocalDateTime end = start.plusDays(1);
+        List<QuestionDto> result = new ArrayList<>();
+        questionRepository.findByCreatedOnBetween(start, end).forEach(qe -> result.add(questionEntityToDto.convert(qe)));
         return result;
     }
 }
