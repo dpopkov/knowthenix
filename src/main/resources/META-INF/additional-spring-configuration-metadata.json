@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "app.data.init",
+      "type": "java.lang.Boolean",
+      "description": "Flag whether to initialize database when application starts."
+  }
+] }

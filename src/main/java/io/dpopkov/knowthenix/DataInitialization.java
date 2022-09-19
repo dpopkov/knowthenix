@@ -1,5 +1,6 @@
 package io.dpopkov.knowthenix;
 
+import io.dpopkov.knowthenix.config.AppDataProps;
 import io.dpopkov.knowthenix.domain.entities.KeyTermEntity;
 import io.dpopkov.knowthenix.domain.entities.answer.AnswerEntity;
 import io.dpopkov.knowthenix.domain.entities.answer.AnswerTextEntity;
@@ -19,15 +20,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataInitialization {
 
+    private final AppDataProps appDataProps;
     private final CategoryRepository categoryRepository;
     private final KeyTermRepository keyTermRepository;
     private final QuestionRepository questionRepository;
     private final SourceRepository sourceRepository;
     private final AnswerRepository answerRepository;
 
-    public DataInitialization(CategoryRepository categoryRepository, KeyTermRepository keyTermRepository,
+    public DataInitialization(AppDataProps appDataProps, CategoryRepository categoryRepository, KeyTermRepository keyTermRepository,
                               QuestionRepository questionRepository, SourceRepository sourceRepository,
                               AnswerRepository answerRepository) {
+        this.appDataProps = appDataProps;
         this.categoryRepository = categoryRepository;
         this.keyTermRepository = keyTermRepository;
         this.questionRepository = questionRepository;
@@ -37,6 +40,9 @@ public class DataInitialization {
 
     @EventListener(ApplicationReadyEvent.class)
     public void initData() {
+        if (!appDataProps.isInit()) {
+            return;
+        }
         log.debug("initData started");
 
         CategoryEntity categoryJava = new CategoryEntity("Java", "Java programming language");
