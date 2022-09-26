@@ -1,0 +1,20 @@
+# H2 datasource
+spring:
+  datasource:
+    username: sa
+    password:
+    url: jdbc:h2:mem:test
+  jpa:
+    hibernate:
+      ddl-auto: create
+    # After Hibernate schema creation is performed then additionally data.sql is executed to populate the db
+    defer-datasource-initialization: true
+  # Set init platform H2 for using data-h2.sql script
+  sql:
+    init:
+      platform: h2
+
+# Application custom properties
+app:
+  data:
+    init: true
