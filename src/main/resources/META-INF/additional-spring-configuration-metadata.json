@@ -4,5 +4,11 @@
       "name": "app.data.init",
       "type": "java.lang.Boolean",
       "description": "Flag whether to initialize database when application starts."
-  }
-] }
+    },
+    {
+      "name": "app.client.allowedOrigin",
+      "type": "java.lang.String",
+      "description": "The origin for which cross-origin requests are allowed from a client's browser."
+    }
+  ]
+}

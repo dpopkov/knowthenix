@@ -1,3 +1,8 @@
+# Application custom properties
+app:
+  client:
+    allowedOrigin: http://localhost:4200
+
 # Logging properties
 logging:
   level:

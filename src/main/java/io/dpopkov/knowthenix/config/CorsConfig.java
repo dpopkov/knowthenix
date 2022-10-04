@@ -9,10 +9,16 @@ import static io.dpopkov.knowthenix.config.AppConstants.API;
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
+    private final AppClientProps appClientProps;
+
+    public CorsConfig(AppClientProps appClientProps) {
+        this.appClientProps = appClientProps;
+    }
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping(API + "/**")
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE")
-                .allowedOrigins("http://localhost:4200");
+                .allowedOrigins(appClientProps.getAllowedOrigin());
     }
 }
