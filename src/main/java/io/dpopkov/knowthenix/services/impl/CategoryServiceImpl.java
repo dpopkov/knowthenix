@@ -8,6 +8,8 @@ import io.dpopkov.knowthenix.services.dto.CategoryDto;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -43,6 +45,7 @@ public class CategoryServiceImpl implements CategoryService {
         return new ModelMapper().map(categoryRepository.findAll(), typeOfList);
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public CategoryDto update(CategoryDto dto) {
         Optional<CategoryEntity> byId = categoryRepository.findById(dto.getId());

@@ -19,6 +19,7 @@ import io.dpopkov.knowthenix.services.dto.converters.TranslationDtoToQuestionTex
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -74,6 +75,7 @@ public class QuestionServiceImpl implements QuestionService {
         return result;
     }
 
+    @Transactional
     @Override
     public QuestionDto update(QuestionDto dto) {
         if (!questionRepository.existsById(dto.getId())) {
@@ -100,7 +102,7 @@ public class QuestionServiceImpl implements QuestionService {
         return result;
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public TranslationDto addTranslation(Long questionId, TranslationDto translation) {
         QuestionEntity question = questionRepository.findById(questionId)
@@ -112,6 +114,7 @@ public class QuestionServiceImpl implements QuestionService {
         return questionTextEntityToDto.convert(savedEntity);
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public TranslationDto updateTranslation(Long questionId, TranslationDto translationDto) {
         if (!questionRepository.existsById(questionId)) {
@@ -136,7 +139,7 @@ public class QuestionServiceImpl implements QuestionService {
         return result;
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public Collection<Long> changeKeyTermsByQuestionId(Long questionId, IdChangeSetDto idChangeSetDto) {
         QuestionEntity questionEntity = questionRepository.findById(questionId)

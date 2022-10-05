@@ -7,6 +7,8 @@ import io.dpopkov.knowthenix.services.AppUserService;
 import io.dpopkov.knowthenix.services.dto.AppUserCreateDto;
 import io.dpopkov.knowthenix.services.dto.AppUserDto;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +45,7 @@ public class AppUserServiceImpl implements AppUserService {
         return list;
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public AppUserDto update(AppUserDto dto) {
         Optional<AppUserEntity> byId = appUserRepository.findById(dto.getId());

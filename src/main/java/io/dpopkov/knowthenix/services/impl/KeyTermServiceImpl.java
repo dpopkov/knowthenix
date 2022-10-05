@@ -8,6 +8,8 @@ import io.dpopkov.knowthenix.services.dto.KeyTermDto;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -43,6 +45,7 @@ public class KeyTermServiceImpl implements KeyTermService {
         return new ModelMapper().map(keyTermRepository.findAll(), typeOfList);
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public KeyTermDto update(KeyTermDto dto) {
         Optional<KeyTermEntity> byId = keyTermRepository.findById(dto.getId());

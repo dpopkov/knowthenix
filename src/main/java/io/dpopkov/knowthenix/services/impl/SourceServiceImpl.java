@@ -8,6 +8,8 @@ import io.dpopkov.knowthenix.services.dto.SourceDto;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -43,6 +45,7 @@ public class SourceServiceImpl implements SourceService {
         return new ModelMapper().map(sourceRepository.findAll(), typeOfList);
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public SourceDto update(SourceDto dto) {
         SourceEntity found = sourceRepository.findById(dto.getId()).orElseThrow(

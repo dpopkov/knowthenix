@@ -20,6 +20,7 @@ import io.dpopkov.knowthenix.services.dto.converters.AnswerTextEntityToDto;
 import io.dpopkov.knowthenix.services.dto.converters.TranslationDtoToAnswerTextEntity;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -62,6 +63,7 @@ public class AnswerServiceImpl implements AnswerService {
         return result;
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public AnswerDto create(AnswerDto dto) {
         if (anyIdIsMissing(dto.getQuestionId(), dto.getSourceId())) {
@@ -91,6 +93,7 @@ public class AnswerServiceImpl implements AnswerService {
         return null;
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public AnswerDto update(AnswerDto dto) {
         if (anyIdIsMissing(dto.getQuestionId(), dto.getSourceId())) {
@@ -126,7 +129,7 @@ public class AnswerServiceImpl implements AnswerService {
         return result;
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public TranslationDto addTranslation(Long answerId, TranslationDto translation) {
         AnswerEntity answer = answerRepository.findById(answerId)
@@ -138,6 +141,7 @@ public class AnswerServiceImpl implements AnswerService {
         return answerTextEntityToDto.convert(savedTextEntity);
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public TranslationDto updateTranslation(Long answerId, TranslationDto translation) {
         if (!answerRepository.existsById(answerId)) {
@@ -162,6 +166,7 @@ public class AnswerServiceImpl implements AnswerService {
         return result;
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public Collection<Long> changeKeyTermsByAnswerId(Long answerId, IdChangeSetDto idChangeSetDto) {
         AnswerEntity answerEntity = answerRepository.findById(answerId)
