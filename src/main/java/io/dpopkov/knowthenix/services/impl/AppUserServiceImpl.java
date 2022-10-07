@@ -62,4 +62,16 @@ public class AppUserServiceImpl implements AppUserService {
     public void delete(Long id) {
         appUserRepository.deleteById(id);
     }
+
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Override
+    public void resetPassword(Long id) {
+        Optional<AppUserEntity> byId = appUserRepository.findById(id);
+        if (byId.isEmpty()) {
+            throw new AppServiceException("User not found");
+        }
+        AppUserEntity entity = byId.get();
+        entity.setPassword("secret");
+        appUserRepository.save(entity);
+    }
 }

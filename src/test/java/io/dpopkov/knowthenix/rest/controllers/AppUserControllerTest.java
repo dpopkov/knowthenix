@@ -125,4 +125,13 @@ class AppUserControllerTest {
         // Then
         then(service).should().delete(ID);
     }
+
+    @Test
+    void resetPassword() throws Exception {
+        // When
+        mockMvc.perform(put(USERS_URL + "/resetPassword/" + ID))
+                .andExpect(status().isNoContent());
+        // Then
+        then(service).should().resetPassword(ID);
+    }
 }

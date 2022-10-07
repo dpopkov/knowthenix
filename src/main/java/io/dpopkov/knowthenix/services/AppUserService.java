@@ -16,4 +16,6 @@ public interface AppUserService {
     AppUserDto update(AppUserDto dto);
 
     void delete(Long id);
+
+    void resetPassword(Long id);
 }

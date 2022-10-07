@@ -62,4 +62,10 @@ public class AppUserController {
         appUserService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @PutMapping("/resetPassword/{userId}")
+    public ResponseEntity<?> resetPassword(@PathVariable("userId") Long id) {
+        appUserService.resetPassword(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }
