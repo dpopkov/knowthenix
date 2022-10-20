@@ -9,4 +9,5 @@ public class AppConstants {
     public static final String KEYTERMS_URL = API + "/keyterms";
     public static final String SOURCES_URL = API + "/sources";
     public static final String USERS_URL = API + "/users";
+    public static final String BASIC_AUTH_URL = API + "/basicAuth";
 }
