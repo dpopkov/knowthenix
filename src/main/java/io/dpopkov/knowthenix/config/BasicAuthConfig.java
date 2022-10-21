@@ -19,7 +19,11 @@ public class BasicAuthConfig extends WebSecurityConfigurerAdapter {
         auth.inMemoryAuthentication()
                 .withUser("james")
                 .password("{noop}secret12")
-                .authorities("ROLE_ADMIN");
+                .authorities("ROLE_ADMIN")
+            .and()
+                .withUser("alice")
+                .password("{noop}secret34")
+                .authorities("ROLE_USER");
     }
 
     /*
@@ -32,6 +36,7 @@ public class BasicAuthConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, BASIC_AUTH_URL + "/**").permitAll()
                 .antMatchers(BASIC_AUTH_URL + "/**").hasRole("ADMIN")
