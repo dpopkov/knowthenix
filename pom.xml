@@ -17,6 +17,7 @@
     <properties>
         <java.version>11</java.version>
         <modelmapper.version>3.0.0</modelmapper.version>
+        <java-jwt.version>3.19.1</java-jwt.version>
     </properties>
 
     <dependencies>
@@ -35,6 +36,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <!-- java-jwt is used for generating a JWT -->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <scope>compile</scope>
+            <version>${java-jwt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.modelmapper</groupId>
