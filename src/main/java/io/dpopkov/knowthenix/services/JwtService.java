@@ -14,6 +14,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
 import java.util.Date;
 
+// todo: create interface for JwtService and 2 implementations (this w RSA256, HMAC512 w secret)
 @Service
 public class JwtService {
 
