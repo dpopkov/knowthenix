@@ -71,5 +71,8 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(API_ANY).hasRole(ADMIN)
                 .and()
                 .addFilter(new JwtAuthorizationFilter(authenticationManager()));
+
+        // For h2 console
+        http.headers().frameOptions().disable();
     }
 }
