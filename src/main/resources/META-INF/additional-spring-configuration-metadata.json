@@ -9,6 +9,11 @@
       "name": "app.client.allowedOrigin",
       "type": "java.lang.String",
       "description": "The origin for which cross-origin requests are allowed from a client's browser."
+    },
+    {
+      "name": "app.jwt.secret",
+      "type": "java.lang.String",
+      "description": "Secret value used when getting algorithm that verifies or signs JWT."
     }
   ]
 }

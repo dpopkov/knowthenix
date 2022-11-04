@@ -2,6 +2,9 @@
 app:
   client:
     allowedOrigin: http://localhost:4200
+  # Security configuration
+  jwt:
+    secret: asd3icvzASC99adml_e7Iiod0sdfa-dfa9865vB18cy65kjJ
 
 # Logging properties
 logging:
