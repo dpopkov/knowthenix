@@ -5,10 +5,13 @@ app:
   # Security configuration
   jwt:
     secret: asd3icvzASC99adml_e7Iiod0sdfa-dfa9865vB18cy65kjJ
+  security:
+    permitall: false
 
 # Logging properties
 logging:
   level:
     io.dpopkov.knowthenix.DataInitialization: DEBUG
     io.dpopkov.knowthenix.rest.controllers: DEBUG
+    io.dpopkov.knowthenix.security: TRACE
 #    io.dpopkov.knowthenix.config.JwtAuthorizationFilter: TRACE

@@ -14,6 +14,11 @@
       "name": "app.jwt.secret",
       "type": "java.lang.String",
       "description": "Secret value used when getting algorithm that verifies or signs JWT."
+    },
+    {
+      "name": "app.security.permitall",
+      "type": "java.lang.Boolean",
+      "description": "Allows access to all URLs of the application."
     }
   ]
 }

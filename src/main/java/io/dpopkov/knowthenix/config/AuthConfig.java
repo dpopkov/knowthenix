@@ -10,8 +10,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 import static io.dpopkov.knowthenix.config.AppConstants.*;
 
-@Configuration
-@EnableWebSecurity
+// todo: remove this class after new SecurityConfig is tested
+
+//@Configuration
+//@EnableWebSecurity
 public class AuthConfig extends WebSecurityConfigurerAdapter {
 
     private static final String ADMIN = "ADMIN";
