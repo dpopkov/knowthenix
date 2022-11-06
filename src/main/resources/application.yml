@@ -8,6 +8,11 @@ app:
   security:
     permitall: false
 
+# Path to the error controller may be customized here
+server:
+  error:
+    path: /error
+
 # Logging properties
 logging:
   level:

@@ -20,7 +20,6 @@ import java.util.Set;
 
 @Slf4j
 @RestControllerAdvice
-
 public class ExceptionHandling {
 
     private static final String ACCOUNT_LOCKED_MSG = "Your account has been locked. Please contact administration";
