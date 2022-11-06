@@ -1,7 +1,6 @@
 package io.dpopkov.knowthenix.domain.entities.user;
 
 import io.dpopkov.knowthenix.domain.entities.ModifiableEntity;
-import io.dpopkov.knowthenix.domain.enums.Role;
 import lombok.*;
 
 import javax.persistence.*;
