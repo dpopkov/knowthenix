@@ -34,7 +34,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        log.trace("Request {} on {}", request.getMethod(), request.getRequestURL());
+        if (request.getRequestURL().indexOf("/h2-console/") == -1) {
+            log.trace("Request {} on {}", request.getMethod(), request.getRequestURL());
+        }
         if (request.getMethod().equals(HttpMethod.OPTIONS.name())) {
             response.setStatus(HttpStatus.OK.value());
         } else {
