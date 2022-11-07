@@ -8,12 +8,14 @@ import io.dpopkov.knowthenix.security.JwtProvider;
 import io.dpopkov.knowthenix.security.SecurityConstants;
 import io.dpopkov.knowthenix.services.AppServiceException;
 import io.dpopkov.knowthenix.services.AuthUserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/user")
 public class AuthUserController {
@@ -41,6 +43,7 @@ public class AuthUserController {
     @PostMapping("/login")
     public ResponseEntity<AuthUserEntity> login(@RequestBody LoginUserRequest user) {
         authenticate(user.getUsername(), user.getPassword());
+        log.trace("User {} authenticated successfully", user.getUsername());
         AuthUserEntity loginUser = authUserService.findByUsername(user.getUsername()).orElseThrow();
         AuthUserPrincipal principal = new AuthUserPrincipal(
                 loginUser.getUsername(), loginUser.getEncryptedPassword(), loginUser.getAuthorities(),

@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+// todo: remove this class after new JwtAuthFilter and SecurityConfig are finished tested
+
 @Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 

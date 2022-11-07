@@ -5,6 +5,7 @@ import io.dpopkov.knowthenix.domain.entities.user.Role;
 import io.dpopkov.knowthenix.domain.repositories.AuthUserRepository;
 import io.dpopkov.knowthenix.security.AuthUserPrincipal;
 import io.dpopkov.knowthenix.services.AuthUserService;
+import io.dpopkov.knowthenix.services.LoginAttemptService;
 import io.dpopkov.knowthenix.services.exceptions.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -32,10 +33,12 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
 
     private final AuthUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final LoginAttemptService loginAttemptService;
 
-    public AuthUserServiceImpl(AuthUserRepository authUserRepository, PasswordEncoder passwordEncoder) {
+    public AuthUserServiceImpl(AuthUserRepository authUserRepository, PasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService) {
         this.userRepository = authUserRepository;
         this.passwordEncoder = passwordEncoder;
+        this.loginAttemptService = loginAttemptService;
     }
 
     @Override
@@ -46,13 +49,27 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
             throw new UsernameNotFoundException(USER_NOT_FOUND_BY_USERNAME);
         }
         AuthUserEntity user = byUsername.get();
-        user.setLastLoginDateDisplay(user.getLastLoginDate());
-        user.setLastLoginDate(new Date());
-        userRepository.save(user);
-        AuthUserPrincipal principal = new AuthUserPrincipal(user.getUsername(), user.getEncryptedPassword(),
-                user.getAuthorities(), user.isNotLocked(), user.isActive());
         log.trace("User found by username {}" ,username);
-        return principal;
+        updateLoginAttemptStatusFor(user);
+        if (user.isNotLocked()) {
+            user.setLastLoginDateDisplay(user.getLastLoginDate());
+            user.setLastLoginDate(new Date());
+        }
+        log.trace("User's notLocked status: {}", user.isNotLocked());
+        userRepository.save(user);
+        return new AuthUserPrincipal(user.getUsername(), user.getEncryptedPassword(),
+                user.getAuthorities(), user.isNotLocked(), user.isActive());
+    }
+
+    private void updateLoginAttemptStatusFor(AuthUserEntity user) {
+        if (user.isNotLocked()) {
+            if (loginAttemptService.reachedAttemptsLimit(user.getUsername())) {
+                log.info("Locking user '{}'", user.getUsername());
+                user.setNotLocked(false);
+            }
+        } else {
+            loginAttemptService.evictUser(user.getUsername());
+        }
     }
 
     @Override

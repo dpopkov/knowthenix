@@ -19,7 +19,7 @@ server:
 logging:
   level:
     io.dpopkov.knowthenix.DataInitialization: DEBUG
-    io.dpopkov.knowthenix.rest.controllers: DEBUG
+    io.dpopkov.knowthenix.rest.controllers: TRACE
     io.dpopkov.knowthenix.services: TRACE
     io.dpopkov.knowthenix.security: TRACE
 #    io.dpopkov.knowthenix.config.JwtAuthorizationFilter: TRACE
