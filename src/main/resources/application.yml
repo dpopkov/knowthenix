@@ -7,6 +7,8 @@ app:
     secret: asd3icvzASC99adml_e7Iiod0sdfa-dfa9865vB18cy65kjJ
   security:
     permitall: false
+    maximumLoginAttempts: 3
+    loginAttemptsExpiration: 5
 
 # Path to the error controller may be customized here
 server:
