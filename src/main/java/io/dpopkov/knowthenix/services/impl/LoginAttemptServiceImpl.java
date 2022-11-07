@@ -56,12 +56,12 @@ public class LoginAttemptServiceImpl implements LoginAttemptService {
     @Override
     public boolean reachedAttemptsLimit(String username) {
         try {
-            boolean reached = loginAttemptCache.get(username) >= maximumNumberOfAttempts;
+            final int currentNumberOfAttempts = loginAttemptCache.get(username);
+            boolean reached = currentNumberOfAttempts >= maximumNumberOfAttempts;
             if (reached) {
                 log.trace("User '{}' reached maximum number of login attempts", username);
             } else {
-                int numAttempts = loginAttemptCache.get(username);
-                log.trace("User '{}' made {} attempts and has not reached limit", username, numAttempts);
+                log.trace("User '{}' made {} attempts and has not reached limit", username, currentNumberOfAttempts);
             }
             return reached;
         } catch (Exception e) {

@@ -9,4 +9,6 @@ public interface AuthUserRepository extends BaseRepository<AuthUserEntity> {
     Optional<AuthUserEntity> findByUsername(String username);
 
     Optional<AuthUserEntity> findByEmail(String email);
+
+    void deleteByUsername(String username);
 }

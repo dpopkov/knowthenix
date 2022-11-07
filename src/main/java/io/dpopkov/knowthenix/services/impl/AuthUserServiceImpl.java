@@ -75,7 +75,7 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     @Override
     public AuthUserEntity register(String firstName, String lastName, String username, String email)
             throws UsernameExistsException, EmailExistsException {
-        validateRegisteringUsernameAndEmail(username, email);
+        validateNewUsernameAndEmail(username, email);
         AuthUserEntity newUser = AuthUserEntity.builder()
                 .publicId(generatePublicId())
                 .firstName(firstName)
@@ -91,16 +91,66 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
                 .notLocked(true)
                 .build();
         AuthUserEntity savedUser = userRepository.save(newUser);
-        log.trace("Saved user '{}'", savedUser.getUsername());
+        log.trace("Saved registered user '{}'", savedUser.getUsername());
         return savedUser;
     }
 
+    @Override
+    public AuthUserEntity addNewUser(String firstName, String lastName, String username, String email, String role,
+                               boolean isNotLocked, boolean isActive)
+            throws EmailExistsException, UsernameExistsException {
+        validateNewUsernameAndEmail(username, email);
+        Role userRole = Role.valueOf(role.toUpperCase());
+        AuthUserEntity newUser = AuthUserEntity.builder()
+                .publicId(generatePublicId())
+                .firstName(firstName)
+                .lastName(lastName)
+                .username(username)
+                .encryptedPassword(encodePassword(generatePassword()))
+                .email(email)
+                .profileImageUrl(getTemporaryProfileImageUrl())
+                .joinDate(new Date())
+                .role(userRole)
+                .authorities(userRole.getAuthoritiesAsList())
+                .active(isActive)
+                .notLocked(isNotLocked)
+                .build();
+        AuthUserEntity savedUser = userRepository.save(newUser);
+        log.trace("Saved new user '{}'", savedUser.getUsername());
+        return savedUser;
+    }
+
+    @Override
+    public AuthUserEntity updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername,
+                               String newEmail, String role, boolean isNotLocked, boolean isActive)
+            throws UserNotFoundException, UsernameExistsException, EmailExistsException {
+        AuthUserEntity user = validateUpdatingUsernameAndEmail(currentUsername, newUsername, newEmail);
+        user.setFirstName(newFirstName);
+        user.setLastName(newLastName);
+        user.setUsername(newUsername);
+        user.setEmail(newEmail);
+        Role userRole = Role.valueOf(role.toUpperCase());
+        user.setRole(userRole);
+        user.setAuthorities(userRole.getAuthoritiesAsList());
+        user.setActive(isActive);
+        user.setNotLocked(isNotLocked);
+        AuthUserEntity savedUser = userRepository.save(user);
+        log.trace("Saved updated user '{}'", savedUser.getUsername());
+        return savedUser;
+    }
+
+    @Override
+    public void deleteUserByUsername(String username) {
+        userRepository.deleteByUsername(username);
+        log.trace("User deleted by username {}", username);
+    }
+
     private String generatePublicId() {
-        return RandomStringUtils.randomNumeric(16);
+        return RandomStringUtils.randomNumeric(PUBLIC_ID_LENGTH);
     }
 
     private String generatePassword() {
-        String password = RandomStringUtils.randomAlphanumeric(16);
+        String password = RandomStringUtils.randomAlphanumeric(GENERATED_PASSWORD_LENGTH);
         // todo: remove logging of generated password when the complete functionality is ready.
         log.info("Generated password: {}", password);
         return password;
@@ -116,7 +166,7 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
                 .toUriString();
     }
 
-    private void validateRegisteringUsernameAndEmail(String newUsername, String newEmail)
+    private void validateNewUsernameAndEmail(String newUsername, String newEmail)
             throws UsernameExistsException, EmailExistsException {
         if (findByUsername(newUsername).isPresent()) {
             throw new UsernameExistsException(USERNAME_ALREADY_EXISTS);

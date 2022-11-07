@@ -13,4 +13,6 @@ public interface AuthUserJpaRepository extends AuthUserRepository, CrudRepositor
     Optional<AuthUserEntity> findByUsername(String username);
 
     Optional<AuthUserEntity> findByEmail(String email);
+
+    void deleteByUsername(String username);
 }
