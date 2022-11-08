@@ -18,7 +18,6 @@ public class SecurityConstants {
     public static final String[] PUBLIC_URLS = {
             USER_PREFIX + "/login",
             USER_PREFIX + "/register",
-            USER_PREFIX + "/resetPassword/**",
             USER_PREFIX + "/image/**",
             H2_CONSOLE_URL};
 }

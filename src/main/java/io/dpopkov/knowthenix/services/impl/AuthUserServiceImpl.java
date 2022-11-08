@@ -85,8 +85,8 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
                 .email(email)
                 .profileImageUrl(getTemporaryProfileImageUrl())
                 .joinDate(new Date())
-                .role(Role.ROLE_USER)
-                .authorities(Role.ROLE_USER.getAuthoritiesAsList())
+                .role(Role.defaultRole())
+                .authorities(Role.defaultRole().getAuthoritiesAsList())
                 .active(true)
                 .notLocked(true)
                 .build();
@@ -141,6 +141,7 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
 
     @Override
     public void deleteUserByUsername(String username) {
+        // todo: implement archiving user instead of deleting
         userRepository.deleteByUsername(username);
         log.trace("User deleted by username {}", username);
     }
@@ -168,17 +169,17 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
 
     private void validateNewUsernameAndEmail(String newUsername, String newEmail)
             throws UsernameExistsException, EmailExistsException {
-        if (findByUsername(newUsername).isPresent()) {
+        if (userRepository.findByUsername(newUsername).isPresent()) {
             throw new UsernameExistsException(USERNAME_ALREADY_EXISTS);
         }
-        if (findByEmail(newEmail).isPresent()) {
+        if (userRepository.findByEmail(newEmail).isPresent()) {
             throw new EmailExistsException(EMAIL_ALREADY_EXISTS);
         }
     }
 
     private AuthUserEntity validateUpdatingUsernameAndEmail(String currentUsername, String newUsername, String newEmail)
             throws UserNotFoundException, UsernameExistsException, EmailExistsException {
-        var byCurrentUsername = findByUsername(currentUsername);
+        var byCurrentUsername = userRepository.findByUsername(currentUsername);
         if (byCurrentUsername.isEmpty()) {
             throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + currentUsername);
         }
@@ -190,7 +191,7 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
 
     private void checkForOtherUserWithThisUsername(AuthUserEntity currentUser, String newUsername)
             throws UsernameExistsException {
-        var byNewUsername = findByUsername(newUsername);
+        var byNewUsername = userRepository.findByUsername(newUsername);
         if (byNewUsername.isPresent() && currentUser.isNotSameById(byNewUsername.get())) {
             throw new UsernameExistsException(USERNAME_ALREADY_EXISTS);
         }
@@ -198,8 +199,8 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
 
     private void checkForOtherUserWithThisEmail(AuthUserEntity currentUser, String newEmail)
             throws EmailExistsException {
-        var byByNewEmail = findByEmail(newEmail);
-        if (byByNewEmail.isPresent() && currentUser.isNotSameById(byByNewEmail.get())) {
+        var byNewEmail = userRepository.findByEmail(newEmail);
+        if (byNewEmail.isPresent() && currentUser.isNotSameById(byNewEmail.get())) {
             throw new EmailExistsException(EMAIL_ALREADY_EXISTS);
         }
     }
@@ -211,12 +212,14 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     }
 
     @Override
-    public Optional<AuthUserEntity> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public AuthUserEntity findByUsername(String username) throws UserNotFoundException {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_BY_USERNAME));
     }
 
     @Override
-    public Optional<AuthUserEntity> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public AuthUserEntity findByEmail(String email) throws UserNotFoundException {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_BY_EMAIL));
     }
 }

@@ -44,7 +44,7 @@ public class AuthUserEntity extends ModifiableEntity {
     private Collection<String> authorities = new ArrayList<>();
     private boolean active;
     private boolean notLocked;
-    /** When user is "deleted" it is archived actually. */
+    /** When user is "deleted" it should be archived actually. */
     private boolean archived;
 
     public boolean isNotSameById(AuthUserEntity other) {

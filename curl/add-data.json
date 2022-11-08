@@ -1,0 +1,9 @@
+{
+  "firstName":"Jack",
+  "lastName":"Sparrow",
+  "username":"jack",
+  "email":"jack@example.org",
+  "role":"ROLE_SUPER_ADMIN",
+  "notLocked":"true",
+  "active":"true"
+}

@@ -18,6 +18,10 @@ public enum Role {
         this.authorities = authorities;
     }
 
+    public static Role defaultRole() {
+        return ROLE_USER;
+    }
+
     /** Returns a standard dynamic array list of Strings representing authorities of the role. */
     public List<String> getAuthoritiesAsList() {
         return new ArrayList<>(Arrays.asList(authorities));

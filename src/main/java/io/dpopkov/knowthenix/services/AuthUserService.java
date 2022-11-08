@@ -15,9 +15,9 @@ public interface AuthUserService {
 
     List<AuthUserEntity> getAllUsers();
 
-    Optional<AuthUserEntity> findByUsername(String username);
+    AuthUserEntity findByUsername(String username) throws UserNotFoundException;
 
-    Optional<AuthUserEntity> findByEmail(String email);
+    AuthUserEntity findByEmail(String email) throws UserNotFoundException;
 
     // todo: for next 2 methods add MultipartFile for profile image
 
