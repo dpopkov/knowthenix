@@ -31,19 +31,29 @@ curl -v --request POST 'http://localhost:8080/user/login' \
 ## Add new user
 ```shell script
 curl -X POST  \
---header 'Content-Type: application/json' \
 --header 'Authorization: Bearer <JWT-value-of-current-user-goes-here>' \
--d @add-data.json \
+--form 'firstName="Billy"' \
+--form 'lastName="Bones"' \
+--form 'username="bill"' \
+--form 'email="bill@example.org"' \
+--form 'role="ROLE_SUPER_ADMIN"' \
+--form 'notLocked="true"' \
+--form 'active="true"'
 'http://localhost:8080/user'
 ```
 
 ## Update user
 ```shell script
-curl -X PUT  \
---header 'Content-Type: application/json' \
+curl -X PUT http://localhost:8080/user \
 --header 'Authorization: Bearer <JWT-value-of-current-user-goes-here>' \
--d @update-data.json \
-'http://localhost:8080/user'
+--form 'firstName="Billy"' \
+--form 'lastName="BigBones"' \
+--form 'username="bill"' \
+--form 'email="bill@example.org"' \
+--form 'role="ROLE_SUPER_ADMIN"' \
+--form 'notLocked="true"' \
+--form 'active="true"' \
+--form 'currentUsername="bill"'
 ```
 
 ## Delete user
