@@ -2,7 +2,6 @@ package io.dpopkov.knowthenix.rest.controllers;
 
 import io.dpopkov.knowthenix.domain.entities.user.AuthUserEntity;
 import io.dpopkov.knowthenix.rest.AppHttpResponse;
-import io.dpopkov.knowthenix.rest.model.request.AddUpdateUserRequest;
 import io.dpopkov.knowthenix.rest.model.request.LoginUserRequest;
 import io.dpopkov.knowthenix.rest.model.request.RegisterUserRequest;
 import io.dpopkov.knowthenix.security.AuthUserPrincipal;
@@ -17,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -76,19 +76,34 @@ public class AuthUserController {
 
     @PostMapping
 //    @PreAuthorize("hasAuthority('" + USER_CREATE + "')")
-    public ResponseEntity<AuthUserEntity> addNewUser(@RequestBody AddUpdateUserRequest request) {
-        AuthUserEntity newUser = authUserService.addNewUser(request.getFirstName(), request.getLastName(),
-                request.getUsername(), request.getEmail(), request.getRole(),
-                request.getNotLocked(), request.getActive());
+    public ResponseEntity<AuthUserEntity> addNewUser(
+            @RequestParam("firstName") String firstName,
+            @RequestParam("lastName") String lastName,
+            @RequestParam("username") String username,
+            @RequestParam("email") String email,
+            @RequestParam("role") String role,
+            @RequestParam("notLocked") Boolean notLocked,
+            @RequestParam("active") Boolean active,
+            @RequestParam(value = "profileImage", required = false) MultipartFile image) {
+        AuthUserEntity newUser = authUserService.addNewUser(firstName, lastName, username, email,
+                                                            role, notLocked, active);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 
     @PutMapping
 //    @PreAuthorize("hasAuthority('" + USER_UPDATE + "')")
-    public ResponseEntity<AuthUserEntity> updateUser(@RequestBody AddUpdateUserRequest request) {
-        AuthUserEntity updated = authUserService.updateUser(request.getCurrentUsername(), request.getFirstName(),
-                request.getLastName(), request.getUsername(), request.getEmail(), request.getRole(),
-                request.getNotLocked(), request.getActive());
+    public ResponseEntity<AuthUserEntity> updateUser(
+            @RequestParam("currentUsername") String currentUsername,
+            @RequestParam("firstName") String newFirstName,
+            @RequestParam("lastName") String newLastName,
+            @RequestParam("username") String newUsername,
+            @RequestParam("email") String newEmail,
+            @RequestParam("role") String newRole,
+            @RequestParam("notLocked") Boolean newNotLocked,
+            @RequestParam("active") Boolean newActive,
+            @RequestParam(value = "profileImage", required = false) MultipartFile image) {
+        AuthUserEntity updated = authUserService.updateUser(currentUsername, newFirstName, newLastName, newUsername,
+                                                            newEmail, newRole, newNotLocked, newActive);
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
