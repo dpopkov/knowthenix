@@ -1,5 +1,6 @@
 package io.dpopkov.knowthenix.rest.controllers;
 
+import io.dpopkov.knowthenix.config.FileConstants;
 import io.dpopkov.knowthenix.domain.entities.user.AuthUserEntity;
 import io.dpopkov.knowthenix.rest.AppHttpResponse;
 import io.dpopkov.knowthenix.rest.model.request.LoginUserRequest;
@@ -19,6 +20,9 @@ import org.springframework.security.authentication.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 import static io.dpopkov.knowthenix.domain.entities.user.Authority.*;
@@ -89,9 +93,9 @@ public class AuthUserController {
             @RequestParam("role") String role,
             @RequestParam("notLocked") Boolean notLocked,
             @RequestParam("active") Boolean active,
-            @RequestParam(value = "profileImage", required = false) MultipartFile image) {
+            @RequestParam(value = "profileImage", required = false) MultipartFile image) throws IOException {
         AuthUserEntity newUser = authUserService.addNewUser(firstName, lastName, username, email,
-                                                            role, notLocked, active);
+                                                            role, notLocked, active, image);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 
@@ -106,9 +110,9 @@ public class AuthUserController {
             @RequestParam("role") String newRole,
             @RequestParam("notLocked") Boolean newNotLocked,
             @RequestParam("active") Boolean newActive,
-            @RequestParam(value = "profileImage", required = false) MultipartFile image) {
+            @RequestParam(value = "profileImage", required = false) MultipartFile image) throws IOException {
         AuthUserEntity updated = authUserService.updateUser(currentUsername, newFirstName, newLastName, newUsername,
-                                                            newEmail, newRole, newNotLocked, newActive);
+                                                            newEmail, newRole, newNotLocked, newActive, image);
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
@@ -144,5 +148,11 @@ public class AuthUserController {
     public byte[] getTemporaryProfileImage(@PathVariable String username) {
         return temporaryProfileImagesService.getImage(username);
     }
-    // todo: add methods to update and get user profile image
+
+    @GetMapping(path = "/image/{username}/{filename}", produces = IMAGE_PNG_VALUE)
+    public byte[] getProfileImage(@PathVariable String username, @PathVariable String filename) throws IOException {
+        // todo: move all operations with images to image service
+        return Files.readAllBytes(Paths.get(FileConstants.USER_FOLDER, username, filename));
+    }
+    // todo: add methods to update user profile image
 }

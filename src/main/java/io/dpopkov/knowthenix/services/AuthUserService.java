@@ -4,8 +4,8 @@ import io.dpopkov.knowthenix.domain.entities.user.AuthUserEntity;
 import io.dpopkov.knowthenix.services.exceptions.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 public interface AuthUserService {
 
@@ -23,12 +23,12 @@ public interface AuthUserService {
 
     /** Used in case when a user is logged in and needs to add another user. */
     AuthUserEntity addNewUser(String firstName, String lastName, String username, String email,
-                        String role, boolean isNotLocked, boolean isActive)
-            throws EmailExistsException, UsernameExistsException;
+                        String role, boolean isNotLocked, boolean isActive, MultipartFile profileImage)
+            throws EmailExistsException, UsernameExistsException, IOException;
 
     AuthUserEntity updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername,
-                        String newEmail, String role, boolean isNotLocked, boolean isActive)
-            throws UserNotFoundException, UsernameExistsException, EmailExistsException;
+                        String newEmail, String role, boolean isNotLocked, boolean isActive, MultipartFile profileImage)
+            throws UserNotFoundException, UsernameExistsException, EmailExistsException, IOException;
 
     void deleteUserByUsername(String username);
 
@@ -37,8 +37,5 @@ public interface AuthUserService {
         throw new UnsupportedOperationException("Reset password is not implemented yet");
     }
 
-    default AuthUserEntity updateProfileImage(String username, MultipartFile profileImage) {
-        // todo: implement updating image after profile image is finished
-        throw new UnsupportedOperationException("Updating image is not implemented yet");
-    }
+    AuthUserEntity updateProfileImage(String username, MultipartFile profileImage);
 }

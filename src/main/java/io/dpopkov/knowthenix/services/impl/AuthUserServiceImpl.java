@@ -1,5 +1,6 @@
 package io.dpopkov.knowthenix.services.impl;
 
+import io.dpopkov.knowthenix.config.FileConstants;
 import io.dpopkov.knowthenix.domain.entities.user.AuthUserEntity;
 import io.dpopkov.knowthenix.domain.entities.user.Role;
 import io.dpopkov.knowthenix.domain.repositories.AuthUserRepository;
@@ -9,16 +10,24 @@ import io.dpopkov.knowthenix.services.LoginAttemptService;
 import io.dpopkov.knowthenix.services.exceptions.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -30,6 +39,9 @@ import static io.dpopkov.knowthenix.services.impl.AuthUserServiceImplConstants.*
 @Transactional
 @Service
 public class AuthUserServiceImpl implements AuthUserService, UserDetailsService {
+
+    private static final String DIRECTORY_CREATED_FORMAT = "Created directory for: {}";
+    private static final String FILE_SAVED_IN_FILE_SYSTEM_FORMAT = "File {} saved in file system as {}.";
 
     private final AuthUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -97,8 +109,8 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
 
     @Override
     public AuthUserEntity addNewUser(String firstName, String lastName, String username, String email, String role,
-                               boolean isNotLocked, boolean isActive)
-            throws EmailExistsException, UsernameExistsException {
+                                     boolean isNotLocked, boolean isActive, MultipartFile profileImage)
+            throws EmailExistsException, UsernameExistsException, IOException {
         validateNewUsernameAndEmail(username, email);
         Role userRole = Role.valueOf(role.toUpperCase());
         AuthUserEntity newUser = AuthUserEntity.builder()
@@ -108,7 +120,7 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
                 .username(username)
                 .encryptedPassword(encodePassword(generatePassword()))
                 .email(email)
-                .profileImageUrl(getTemporaryProfileImageUrl(username))
+                .profileImageUrl(hasImage(profileImage) ? null : getTemporaryProfileImageUrl(username))
                 .joinDate(new Date())
                 .role(userRole)
                 .authorities(userRole.getAuthoritiesAsList())
@@ -116,14 +128,19 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
                 .notLocked(isNotLocked)
                 .build();
         AuthUserEntity savedUser = userRepository.save(newUser);
+        if (hasImage(profileImage)) {
+            saveProfileImage(savedUser, profileImage);
+        }
         log.trace("Saved new user '{}'", savedUser.getUsername());
+        // todo: use email service to send notification by email
         return savedUser;
     }
 
     @Override
     public AuthUserEntity updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername,
-                               String newEmail, String role, boolean isNotLocked, boolean isActive)
-            throws UserNotFoundException, UsernameExistsException, EmailExistsException {
+                                     String newEmail, String role, boolean isNotLocked, boolean isActive,
+                                     MultipartFile profileImage)
+            throws UserNotFoundException, UsernameExistsException, EmailExistsException, IOException {
         AuthUserEntity user = validateUpdatingUsernameAndEmail(currentUsername, newUsername, newEmail);
         user.setFirstName(newFirstName);
         user.setLastName(newLastName);
@@ -135,6 +152,9 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
         user.setActive(isActive);
         user.setNotLocked(isNotLocked);
         AuthUserEntity savedUser = userRepository.save(user);
+        if (hasImage(profileImage)) {
+            saveProfileImage(savedUser, profileImage);
+        }
         log.trace("Saved updated user '{}'", savedUser.getUsername());
         return savedUser;
     }
@@ -144,6 +164,12 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
         // todo: implement archiving user instead of deleting
         userRepository.deleteByUsername(username);
         log.trace("User deleted by username {}", username);
+    }
+
+    @Override
+    public AuthUserEntity updateProfileImage(String username, MultipartFile profileImage) {
+        // todo: implement updating profile image
+        throw new UnsupportedOperationException("Updating image is not implemented yet");
     }
 
     private String generatePublicId() {
@@ -162,10 +188,59 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     }
 
     private String getTemporaryProfileImageUrl(String username) {
-        // todo: get rid of absolute url for image, save only relative part
+        // todo: get rid of absolute url for temporary image, save only relative part
         return ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(DEFAULT_USER_IMAGE_PATH + username)
                 .toUriString();
+    }
+
+    private String profileImageUrl(String username, String extension) {
+        // todo: get rid of absolute url for real profile image, save only relative part
+        return ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path(FileConstants.USER_IMAGE_PATH + username + "/" + username + "." + extension)
+                .toUriString();
+    }
+
+    private void saveProfileImage(AuthUserEntity user, MultipartFile profileImage) throws IOException {
+        if (hasImage(profileImage)) {
+            String extension = getExtensionIfImage(Objects.requireNonNull(profileImage.getContentType()));
+            if (extension == null) {
+                throw new NotAnImageFileException(profileImage.getOriginalFilename() + NOT_AN_IMAGE_FILE);
+            }
+            final String userImageFilename = user.getUsername() + "." + extension;
+            final Path userFolder = ensureFolderForImage(user);
+            final Path imagePath = userFolder.resolve(userImageFilename);
+            // Replace with new image
+            Files.deleteIfExists(imagePath);
+            Files.copy(profileImage.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
+            user.setProfileImageUrl(profileImageUrl(user.getUsername(), extension));
+            userRepository.save(user);
+            log.info(FILE_SAVED_IN_FILE_SYSTEM_FORMAT, profileImage.getOriginalFilename(), userImageFilename);
+        }
+    }
+
+    private boolean hasImage(MultipartFile profileImage) {
+        return profileImage != null && !profileImage.isEmpty();
+    }
+
+    private String getExtensionIfImage(String contentType) {
+        switch (contentType) {
+            case MediaType.IMAGE_JPEG_VALUE:
+                return FileConstants.JPG_EXTENSION;
+            case MediaType.IMAGE_PNG_VALUE:
+                return FileConstants.PNG_EXTENSION;
+            default:
+                return null;
+        }
+    }
+
+    private Path ensureFolderForImage(AuthUserEntity user) throws IOException {
+        Path folder = Paths.get(FileConstants.USER_FOLDER, user.getUsername()).toAbsolutePath().normalize();
+        if (!Files.exists(folder)) {
+            Files.createDirectories(folder);
+            log.info(DIRECTORY_CREATED_FORMAT, folder);
+        }
+        return folder;
     }
 
     private void validateNewUsernameAndEmail(String newUsername, String newEmail)
