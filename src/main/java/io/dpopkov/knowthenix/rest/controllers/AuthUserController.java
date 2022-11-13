@@ -9,6 +9,7 @@ import io.dpopkov.knowthenix.security.JwtProvider;
 import io.dpopkov.knowthenix.security.SecurityConstants;
 import io.dpopkov.knowthenix.services.AppServiceException;
 import io.dpopkov.knowthenix.services.AuthUserService;
+import io.dpopkov.knowthenix.services.TemporaryProfileImagesService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 import static io.dpopkov.knowthenix.domain.entities.user.Authority.*;
+import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 
 @Slf4j
 @RestController
@@ -33,13 +35,16 @@ public class AuthUserController {
     private final AuthUserService authUserService;
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
+    private final TemporaryProfileImagesService temporaryProfileImagesService;
 
     public AuthUserController(AuthUserService authUserService,
                               AuthenticationManager authenticationManager,
-                              JwtProvider jwtProvider) {
+                              JwtProvider jwtProvider,
+                              TemporaryProfileImagesService temporaryProfileImagesService) {
         this.authUserService = authUserService;
         this.authenticationManager = authenticationManager;
         this.jwtProvider = jwtProvider;
+        this.temporaryProfileImagesService = temporaryProfileImagesService;
     }
 
     @PostMapping("/register")
@@ -135,5 +140,9 @@ public class AuthUserController {
         return new ResponseEntity<>(new AppHttpResponse(HttpStatus.OK, USER_DELETED_SUCCESSFULLY), HttpStatus.OK);
     }
 
+    @GetMapping(path = "/image/profile/{username}", produces = IMAGE_PNG_VALUE)
+    public byte[] getTemporaryProfileImage(@PathVariable String username) {
+        return temporaryProfileImagesService.getImage(username);
+    }
     // todo: add methods to update and get user profile image
 }

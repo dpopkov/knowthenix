@@ -83,7 +83,7 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
                 .username(username)
                 .encryptedPassword(encodePassword(generatePassword()))
                 .email(email)
-                .profileImageUrl(getTemporaryProfileImageUrl())
+                .profileImageUrl(getTemporaryProfileImageUrl(username))
                 .joinDate(new Date())
                 .role(Role.defaultRole())
                 .authorities(Role.defaultRole().getAuthoritiesAsList())
@@ -108,7 +108,7 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
                 .username(username)
                 .encryptedPassword(encodePassword(generatePassword()))
                 .email(email)
-                .profileImageUrl(getTemporaryProfileImageUrl())
+                .profileImageUrl(getTemporaryProfileImageUrl(username))
                 .joinDate(new Date())
                 .role(userRole)
                 .authorities(userRole.getAuthoritiesAsList())
@@ -161,9 +161,10 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
         return passwordEncoder.encode(rawPassword);
     }
 
-    private String getTemporaryProfileImageUrl() {
+    private String getTemporaryProfileImageUrl(String username) {
+        // todo: get rid of absolute url for image, save only relative part
         return ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(DEFAULT_USER_IMAGE_PATH + "/temp")
+                .path(DEFAULT_USER_IMAGE_PATH + username)
                 .toUriString();
     }
 
