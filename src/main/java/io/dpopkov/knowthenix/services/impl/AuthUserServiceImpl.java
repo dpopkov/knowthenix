@@ -167,6 +167,16 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     }
 
     @Override
+    public void resetPassword(String email) {
+        AuthUserEntity authUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_BY_EMAIL));
+        String newPassword = generatePassword();
+        authUser.setEncryptedPassword(encodePassword(newPassword));
+        userRepository.save(authUser);
+        // todo: implement notification by email
+    }
+
+    @Override
     public AuthUserEntity updateProfileImage(String username, MultipartFile profileImage) {
         // todo: implement updating profile image
         throw new UnsupportedOperationException("Updating image is not implemented yet");

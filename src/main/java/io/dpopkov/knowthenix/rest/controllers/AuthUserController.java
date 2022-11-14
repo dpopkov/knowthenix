@@ -130,7 +130,7 @@ public class AuthUserController {
         return new ResponseEntity<>(all, HttpStatus.OK);
     }
 
-    @GetMapping("/resetPassword/{email}")
+    @PutMapping("/resetPassword/{email}")
 //    @PreAuthorize("hasAuthority('" + USER_UPDATE + "')")
     public ResponseEntity<AppHttpResponse> resetPassword(@PathVariable("email") String email) {
         authUserService.resetPassword(email);

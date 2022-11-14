@@ -32,10 +32,7 @@ public interface AuthUserService {
 
     void deleteUserByUsername(String username);
 
-    default void resetPassword(String email) {
-        // todo: implement resetting password after Notification by Email is finished
-        throw new UnsupportedOperationException("Reset password is not implemented yet");
-    }
+    void resetPassword(String email);
 
     AuthUserEntity updateProfileImage(String username, MultipartFile profileImage);
 }
