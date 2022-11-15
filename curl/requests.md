@@ -30,7 +30,7 @@ curl -v --request POST 'http://localhost:8080/user/login' \
 
 ## Add new user
 ```shell script
-curl -X POST  \
+curl -X POST http://localhost:8080/user \
 --header 'Authorization: Bearer <JWT-value-of-current-user-goes-here>' \
 --form 'firstName="Billy"' \
 --form 'lastName="Bones"' \
@@ -39,7 +39,6 @@ curl -X POST  \
 --form 'role="ROLE_SUPER_ADMIN"' \
 --form 'notLocked="true"' \
 --form 'active="true"'
-'http://localhost:8080/user'
 ```
 
 ## Update user
