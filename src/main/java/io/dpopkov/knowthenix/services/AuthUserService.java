@@ -30,7 +30,7 @@ public interface AuthUserService {
                         String newEmail, String role, boolean isNotLocked, boolean isActive, MultipartFile profileImage)
             throws UserNotFoundException, UsernameExistsException, EmailExistsException, IOException;
 
-    void deleteUserByUsername(String username);
+    void deleteUserByUsername(String username) throws IOException;
 
     void resetPassword(String email);
 

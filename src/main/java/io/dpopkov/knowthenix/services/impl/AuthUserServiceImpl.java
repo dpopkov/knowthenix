@@ -10,6 +10,7 @@ import io.dpopkov.knowthenix.services.LoginAttemptService;
 import io.dpopkov.knowthenix.services.exceptions.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -160,10 +161,16 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     }
 
     @Override
-    public void deleteUserByUsername(String username) {
+    public void deleteUserByUsername(String username) throws IOException {
         // todo: implement archiving user instead of deleting
         userRepository.deleteByUsername(username);
+        deleteUserImage(username);
         log.trace("User deleted by username {}", username);
+    }
+
+    private void deleteUserImage(String username) throws IOException {
+        Path userFolder = Paths.get(FileConstants.USER_FOLDER, username).toAbsolutePath().normalize();
+        FileUtils.deleteDirectory(userFolder.toFile());
     }
 
     @Override

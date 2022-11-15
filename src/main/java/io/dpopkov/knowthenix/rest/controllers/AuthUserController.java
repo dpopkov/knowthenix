@@ -139,7 +139,7 @@ public class AuthUserController {
 
     @DeleteMapping("/{username}")
 //    @PreAuthorize("hasAuthority('" + USER_DELETE + "')")
-    public ResponseEntity<AppHttpResponse> deleteUser(@PathVariable("username") String username) {
+    public ResponseEntity<AppHttpResponse> deleteUser(@PathVariable("username") String username) throws IOException {
         authUserService.deleteUserByUsername(username);
         return new ResponseEntity<>(new AppHttpResponse(HttpStatus.OK, USER_DELETED_SUCCESSFULLY), HttpStatus.OK);
     }
