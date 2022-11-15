@@ -177,9 +177,12 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     }
 
     @Override
-    public AuthUserEntity updateProfileImage(String username, MultipartFile profileImage) {
-        // todo: implement updating profile image
-        throw new UnsupportedOperationException("Updating image is not implemented yet");
+    public AuthUserEntity updateProfileImage(String username, MultipartFile profileImage)
+            throws IOException, NotAnImageFileException {
+        AuthUserEntity authUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_BY_USERNAME));
+        saveProfileImage(authUser, profileImage);
+        return authUser;
     }
 
     private String generatePublicId() {
@@ -211,7 +214,8 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
                 .toUriString();
     }
 
-    private void saveProfileImage(AuthUserEntity user, MultipartFile profileImage) throws IOException {
+    private void saveProfileImage(AuthUserEntity user, MultipartFile profileImage)
+            throws IOException, NotAnImageFileException {
         if (hasImage(profileImage)) {
             String extension = getExtensionIfImage(Objects.requireNonNull(profileImage.getContentType()));
             if (extension == null) {

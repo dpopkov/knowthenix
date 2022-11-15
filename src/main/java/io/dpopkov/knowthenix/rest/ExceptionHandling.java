@@ -75,6 +75,11 @@ public class ExceptionHandling {
         return createResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
+    @ExceptionHandler(NotAnImageFileException.class)
+    public ResponseEntity<AppHttpResponse> notAnImageFileException(NotAnImageFileException exception) {
+        return createResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
+
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<AppHttpResponse> methodNotSupportedException(HttpRequestMethodNotSupportedException exception) {
         Set<HttpMethod> httpMethods = exception.getSupportedHttpMethods();

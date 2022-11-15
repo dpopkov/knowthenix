@@ -154,5 +154,12 @@ public class AuthUserController {
         // todo: move all operations with images to image service
         return Files.readAllBytes(Paths.get(FileConstants.USER_FOLDER, username, filename));
     }
-    // todo: add methods to update user profile image
+
+    @PutMapping("/updateProfileImage")
+    public ResponseEntity<AuthUserEntity> updateProfileImage(@RequestParam String username,
+                                                             @RequestParam(value = "profileImage") MultipartFile image)
+            throws IOException {
+        AuthUserEntity updatedUser = authUserService.updateProfileImage(username, image);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
 }

@@ -34,5 +34,6 @@ public interface AuthUserService {
 
     void resetPassword(String email);
 
-    AuthUserEntity updateProfileImage(String username, MultipartFile profileImage);
+    AuthUserEntity updateProfileImage(String username, MultipartFile profileImage)
+            throws IOException, NotAnImageFileException;
 }
