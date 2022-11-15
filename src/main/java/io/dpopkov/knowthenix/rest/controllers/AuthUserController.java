@@ -91,11 +91,11 @@ public class AuthUserController {
             @RequestParam("username") String username,
             @RequestParam("email") String email,
             @RequestParam("role") String role,
-            @RequestParam("notLocked") Boolean notLocked,
-            @RequestParam("active") Boolean active,
+            @RequestParam("notLocked") String notLocked,
+            @RequestParam("active") String active,
             @RequestParam(value = "profileImage", required = false) MultipartFile image) throws IOException {
-        AuthUserEntity newUser = authUserService.addNewUser(firstName, lastName, username, email,
-                                                            role, notLocked, active, image);
+        AuthUserEntity newUser = authUserService.addNewUser(firstName, lastName, username, email, role,
+                Boolean.parseBoolean(notLocked), Boolean.parseBoolean(active), image);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 
@@ -108,11 +108,12 @@ public class AuthUserController {
             @RequestParam("username") String newUsername,
             @RequestParam("email") String newEmail,
             @RequestParam("role") String newRole,
-            @RequestParam("notLocked") Boolean newNotLocked,
-            @RequestParam("active") Boolean newActive,
+            @RequestParam("notLocked") String newNotLocked,
+            @RequestParam("active") String newActive,
             @RequestParam(value = "profileImage", required = false) MultipartFile image) throws IOException {
-        AuthUserEntity updated = authUserService.updateUser(currentUsername, newFirstName, newLastName, newUsername,
-                                                            newEmail, newRole, newNotLocked, newActive, image);
+        AuthUserEntity updated = authUserService.updateUser(
+                currentUsername, newFirstName, newLastName, newUsername, newEmail, newRole,
+                Boolean.parseBoolean(newNotLocked), Boolean.parseBoolean(newActive), image);
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
