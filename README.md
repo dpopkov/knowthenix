@@ -12,13 +12,13 @@ This Knowledge Base is planned for later use as a source for generating records 
 (not implemented yet).
 
 ### Used Technologies
-* Back
+* Back-end
     * Spring Boot
     * Spring Data JPA
     * Spring MVC
     * H2 database
     * MySQL, PostgreSQL (not configured yet)
-* Front
+* Front-end
     * [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang) - project built using Angular.
 
 ### How to Launch
@@ -29,10 +29,17 @@ They need to be tested and clarified.
 * Create database: this step will be clarified after configuring non-H2 database
 * Create schema: this step will be clarified after configuring non-H2 database
 * Test connection: this step will be clarified after configuring non-H2 database
-* Run: `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=h2`
+* Run: `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=dev`
+* Use: 
+    * start front-end [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang).
+    * or run curl, httpie, Postman or other client.
 
-### Screenshots
+### TODO: describe custom application properties and profiles
+
+### TODO: describe curl requests
+
+### TODO: Screenshots
 Will be added later.
 
-### Database Schema
+### TODO: Database Schema
 Will be added later.
