@@ -8,10 +8,11 @@ import io.dpopkov.knowthenix.domain.entities.answer.SourceEntity;
 import io.dpopkov.knowthenix.domain.entities.question.CategoryEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionTextEntity;
-import io.dpopkov.knowthenix.domain.entities.user.AppUserEntity;
+import io.dpopkov.knowthenix.domain.entities.user.Role;
 import io.dpopkov.knowthenix.domain.enums.Language;
 import io.dpopkov.knowthenix.domain.enums.SourceType;
 import io.dpopkov.knowthenix.domain.repositories.*;
+import io.dpopkov.knowthenix.services.AuthUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
@@ -29,18 +30,18 @@ public class DataInitialization {
     private final QuestionRepository questionRepository;
     private final SourceRepository sourceRepository;
     private final AnswerRepository answerRepository;
-    private final AppUserRepository appUserRepository;
+    private final AuthUserService authUserService;
 
     public DataInitialization(AppDataProps appDataProps, CategoryRepository categoryRepository, KeyTermRepository keyTermRepository,
                               QuestionRepository questionRepository, SourceRepository sourceRepository,
-                              AnswerRepository answerRepository, AppUserRepository appUserRepository) {
+                              AnswerRepository answerRepository, AuthUserService authUserService) {
         this.appDataProps = appDataProps;
         this.categoryRepository = categoryRepository;
         this.keyTermRepository = keyTermRepository;
         this.questionRepository = questionRepository;
         this.sourceRepository = sourceRepository;
         this.answerRepository = answerRepository;
-        this.appUserRepository = appUserRepository;
+        this.authUserService = authUserService;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -129,16 +130,9 @@ public class DataInitialization {
 
         log.debug("initData saved {} answers", answerRepository.count());
 
-        AppUserEntity james = new AppUserEntity();
-        james.setName("James");
-        james.setPassword("123");
-        appUserRepository.save(james);
-        AppUserEntity alice = new AppUserEntity();
-        alice.setName("Alice");
-        alice.setPassword("123");
-        appUserRepository.save(alice);
-
-        log.debug("initData saved {} users", appUserRepository.count());
+        authUserService.registerWithRole("Jane", "Doe", "jane", "jane@example.org",
+                Role.ROLE_SUPER_ADMIN);
+        log.debug("initData registered 1 user");
 
         log.debug("initData finished");
     }

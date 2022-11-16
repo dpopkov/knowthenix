@@ -7,6 +7,8 @@ import io.dpopkov.knowthenix.domain.repositories.AuthUserRepository;
 import io.dpopkov.knowthenix.security.AuthUserPrincipal;
 import io.dpopkov.knowthenix.services.AuthUserService;
 import io.dpopkov.knowthenix.services.LoginAttemptService;
+import io.dpopkov.knowthenix.services.dto.AuthUserDto;
+import io.dpopkov.knowthenix.services.dto.converters.AuthUserEntityToDto;
 import io.dpopkov.knowthenix.services.exceptions.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -47,11 +49,14 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     private final AuthUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final LoginAttemptService loginAttemptService;
+    private final AuthUserEntityToDto authUserEntityToDto;
 
-    public AuthUserServiceImpl(AuthUserRepository authUserRepository, PasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService) {
+    public AuthUserServiceImpl(AuthUserRepository authUserRepository, PasswordEncoder passwordEncoder,
+                               LoginAttemptService loginAttemptService, AuthUserEntityToDto authUserEntityToDto) {
         this.userRepository = authUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
+        this.authUserEntityToDto = authUserEntityToDto;
     }
 
     @Override
@@ -86,7 +91,13 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     }
 
     @Override
-    public AuthUserEntity register(String firstName, String lastName, String username, String email)
+    public AuthUserDto register(String firstName, String lastName, String username, String email)
+            throws UsernameExistsException, EmailExistsException {
+        return registerWithRole(firstName, lastName, username, email, Role.defaultRole());
+    }
+
+    @Override
+    public AuthUserDto registerWithRole(String firstName, String lastName, String username, String email, Role role)
             throws UsernameExistsException, EmailExistsException {
         validateNewUsernameAndEmail(username, email);
         AuthUserEntity newUser = AuthUserEntity.builder()
@@ -98,18 +109,19 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
                 .email(email)
                 .profileImageUrl(getTemporaryProfileImageUrl(username))
                 .joinDate(new Date())
-                .role(Role.defaultRole())
-                .authorities(Role.defaultRole().getAuthoritiesAsList())
+                .role(role)
+                .authorities(role.getAuthoritiesAsList())
                 .active(true)
                 .notLocked(true)
                 .build();
         AuthUserEntity savedUser = userRepository.save(newUser);
-        log.trace("Saved registered user '{}'", savedUser.getUsername());
-        return savedUser;
+        AuthUserDto userDto = convertToRegisteredDto(savedUser);
+        log.trace("Saved registered user '{}'", userDto.getUsername());
+        return userDto;
     }
 
     @Override
-    public AuthUserEntity addNewUser(String firstName, String lastName, String username, String email, String role,
+    public AuthUserDto addNewUser(String firstName, String lastName, String username, String email, String role,
                                      boolean isNotLocked, boolean isActive, MultipartFile profileImage)
             throws EmailExistsException, UsernameExistsException, IOException {
         validateNewUsernameAndEmail(username, email);
@@ -134,11 +146,11 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
         }
         log.trace("Saved new user '{}'", savedUser.getUsername());
         // todo: use email service to send notification by email
-        return savedUser;
+        return convertToDtoWithAbsoluteUrl(savedUser);
     }
 
     @Override
-    public AuthUserEntity updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername,
+    public AuthUserDto updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername,
                                      String newEmail, String role, boolean isNotLocked, boolean isActive,
                                      MultipartFile profileImage)
             throws UserNotFoundException, UsernameExistsException, EmailExistsException, IOException {
@@ -157,7 +169,7 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
             saveProfileImage(savedUser, profileImage);
         }
         log.trace("Saved updated user '{}'", savedUser.getUsername());
-        return savedUser;
+        return convertToDtoWithAbsoluteUrl(savedUser);
     }
 
     @Override
@@ -184,12 +196,12 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     }
 
     @Override
-    public AuthUserEntity updateProfileImage(String username, MultipartFile profileImage)
+    public AuthUserDto updateProfileImage(String username, MultipartFile profileImage)
             throws IOException, NotAnImageFileException {
         AuthUserEntity authUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_BY_USERNAME));
         saveProfileImage(authUser, profileImage);
-        return authUser;
+        return convertToDtoWithAbsoluteUrl(authUser);
     }
 
     private String generatePublicId() {
@@ -208,17 +220,11 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     }
 
     private String getTemporaryProfileImageUrl(String username) {
-        // todo: get rid of absolute url for temporary image, save only relative part
-        return ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(DEFAULT_USER_IMAGE_PATH + username)
-                .toUriString();
+        return DEFAULT_USER_IMAGE_PATH + username;
     }
 
     private String profileImageUrl(String username, String extension) {
-        // todo: get rid of absolute url for real profile image, save only relative part
-        return ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(FileConstants.USER_IMAGE_PATH + username + "/" + username + "." + extension)
-                .toUriString();
+        return FileConstants.USER_IMAGE_PATH + username + "/" + username + "." + extension;
     }
 
     private void saveProfileImage(AuthUserEntity user, MultipartFile profileImage)
@@ -303,20 +309,48 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     }
 
     @Override
-    public List<AuthUserEntity> getAllUsers() {
+    public List<AuthUserDto> getAllUsers() {
         return StreamSupport.stream(userRepository.findAll().spliterator(), false)
+                .map(this::convertToDtoWithAbsoluteUrl)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public AuthUserEntity findByUsername(String username) throws UserNotFoundException {
+    public AuthUserDto findByUsername(String username) throws UserNotFoundException {
+        return userRepository.findByUsername(username)
+                .map(this::convertToDtoWithAbsoluteUrl)
+                .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_BY_USERNAME));
+    }
+
+    @Override
+    public AuthUserEntity findEntityByUsername(String username) throws UserNotFoundException {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_BY_USERNAME));
     }
 
     @Override
-    public AuthUserEntity findByEmail(String email) throws UserNotFoundException {
+    public AuthUserDto convert(AuthUserEntity entity) {
+        return convertToDtoWithAbsoluteUrl(entity);
+    }
+
+    @Override
+    public AuthUserDto findByEmail(String email) throws UserNotFoundException {
         return userRepository.findByEmail(email)
+                .map(this::convertToDtoWithAbsoluteUrl)
                 .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_BY_EMAIL));
+    }
+
+    private AuthUserDto convertToRegisteredDto(AuthUserEntity entity) {
+        return authUserEntityToDto.convert(entity);
+    }
+
+    private AuthUserDto convertToDtoWithAbsoluteUrl(AuthUserEntity entity) {
+        AuthUserDto userDto = authUserEntityToDto.convert(entity);
+        String absoluteUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path(entity.getProfileImageUrl())
+                .toUriString();
+        assert userDto != null;
+        userDto.setProfileImageUrl(absoluteUrl);
+        return userDto;
     }
 }

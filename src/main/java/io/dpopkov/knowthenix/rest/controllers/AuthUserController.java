@@ -11,6 +11,7 @@ import io.dpopkov.knowthenix.security.SecurityConstants;
 import io.dpopkov.knowthenix.services.AppServiceException;
 import io.dpopkov.knowthenix.services.AuthUserService;
 import io.dpopkov.knowthenix.services.TemporaryProfileImagesService;
+import io.dpopkov.knowthenix.services.dto.AuthUserDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -52,24 +53,24 @@ public class AuthUserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthUserEntity> register(@RequestBody RegisterUserRequest user) throws AppServiceException {
-        AuthUserEntity registered = authUserService.register(user.getFirstName(), user.getLastName(),
+    public ResponseEntity<AuthUserDto> register(@RequestBody RegisterUserRequest user) throws AppServiceException {
+        AuthUserDto registered = authUserService.register(user.getFirstName(), user.getLastName(),
                 user.getUsername(), user.getEmail());
         // todo: fix this line below - the actual entity should not be sent as response!
         return new ResponseEntity<>(registered, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthUserEntity> login(@RequestBody LoginUserRequest user) {
+    public ResponseEntity<AuthUserDto> login(@RequestBody LoginUserRequest user) {
         authenticate(user.getUsername(), user.getPassword());
         log.trace("User {} authenticated successfully", user.getUsername());
-        AuthUserEntity loginUser = authUserService.findByUsername(user.getUsername());
+        AuthUserEntity loginUser = authUserService.findEntityByUsername(user.getUsername());
         AuthUserPrincipal principal = new AuthUserPrincipal(
                 loginUser.getUsername(), loginUser.getEncryptedPassword(), loginUser.getAuthorities(),
                 loginUser.isNotLocked(), loginUser.isActive());
         HttpHeaders jwtHeader = createJwtHeader(principal);
-        // todo: fix this line below - the actual entity should not be sent as response!!!
-        return new ResponseEntity<>(loginUser, jwtHeader, HttpStatus.OK);
+        AuthUserDto dto = authUserService.convert(loginUser);
+        return new ResponseEntity<>(dto, jwtHeader, HttpStatus.OK);
     }
 
     private void authenticate(String username, String password)
@@ -85,7 +86,7 @@ public class AuthUserController {
 
     @PostMapping
 //    @PreAuthorize("hasAuthority('" + USER_CREATE + "')")
-    public ResponseEntity<AuthUserEntity> addNewUser(
+    public ResponseEntity<AuthUserDto> addNewUser(
             @RequestParam("firstName") String firstName,
             @RequestParam("lastName") String lastName,
             @RequestParam("username") String username,
@@ -94,14 +95,14 @@ public class AuthUserController {
             @RequestParam("notLocked") String notLocked,
             @RequestParam("active") String active,
             @RequestParam(value = "profileImage", required = false) MultipartFile image) throws IOException {
-        AuthUserEntity newUser = authUserService.addNewUser(firstName, lastName, username, email, role,
+        AuthUserDto newUser = authUserService.addNewUser(firstName, lastName, username, email, role,
                 Boolean.parseBoolean(notLocked), Boolean.parseBoolean(active), image);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 
     @PutMapping
 //    @PreAuthorize("hasAuthority('" + USER_UPDATE + "')")
-    public ResponseEntity<AuthUserEntity> updateUser(
+    public ResponseEntity<AuthUserDto> updateUser(
             @RequestParam("currentUsername") String currentUsername,
             @RequestParam("firstName") String newFirstName,
             @RequestParam("lastName") String newLastName,
@@ -111,7 +112,7 @@ public class AuthUserController {
             @RequestParam("notLocked") String newNotLocked,
             @RequestParam("active") String newActive,
             @RequestParam(value = "profileImage", required = false) MultipartFile image) throws IOException {
-        AuthUserEntity updated = authUserService.updateUser(
+        AuthUserDto updated = authUserService.updateUser(
                 currentUsername, newFirstName, newLastName, newUsername, newEmail, newRole,
                 Boolean.parseBoolean(newNotLocked), Boolean.parseBoolean(newActive), image);
         return new ResponseEntity<>(updated, HttpStatus.OK);
@@ -119,15 +120,15 @@ public class AuthUserController {
 
     @GetMapping("/{username}")
 //    @PreAuthorize("hasAuthority('" + USER_READ + "')")
-    public ResponseEntity<AuthUserEntity> getByUsername(@PathVariable("username") String username) {
-        AuthUserEntity user = authUserService.findByUsername(username);
+    public ResponseEntity<AuthUserDto> getByUsername(@PathVariable("username") String username) {
+        AuthUserDto user = authUserService.findByUsername(username);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @GetMapping
 //    @PreAuthorize("hasAuthority('" + USER_READ + "')")
-    public ResponseEntity<List<AuthUserEntity>> getAllUsers() {
-        List<AuthUserEntity> all = authUserService.getAllUsers();
+    public ResponseEntity<List<AuthUserDto>> getAllUsers() {
+        List<AuthUserDto> all = authUserService.getAllUsers();
         return new ResponseEntity<>(all, HttpStatus.OK);
     }
 
@@ -157,10 +158,10 @@ public class AuthUserController {
     }
 
     @PutMapping("/updateProfileImage")
-    public ResponseEntity<AuthUserEntity> updateProfileImage(@RequestParam String username,
+    public ResponseEntity<AuthUserDto> updateProfileImage(@RequestParam String username,
                                                              @RequestParam(value = "profileImage") MultipartFile image)
             throws IOException {
-        AuthUserEntity updatedUser = authUserService.updateProfileImage(username, image);
+        AuthUserDto updatedUser = authUserService.updateProfileImage(username, image);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 }

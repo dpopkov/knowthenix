@@ -33,6 +33,7 @@ public class AuthUserEntity extends ModifiableEntity {
     @Column(nullable = false)
     @NotBlank(message ="email cannot be blank.")
     private String email;
+    /** Relative URL to user profile image. */
     private String profileImageUrl;
     @Column(nullable = false)
     private Date joinDate;

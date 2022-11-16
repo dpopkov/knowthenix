@@ -4,9 +4,10 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import io.dpopkov.knowthenix.domain.entities.user.AuthUserEntity;
+import io.dpopkov.knowthenix.domain.repositories.AuthUserRepository;
 import io.dpopkov.knowthenix.services.AppServiceException;
-import io.dpopkov.knowthenix.services.AuthUserService;
 import io.dpopkov.knowthenix.services.TemporaryProfileImagesService;
+import io.dpopkov.knowthenix.services.exceptions.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,8 @@ import java.net.URL;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import static io.dpopkov.knowthenix.services.impl.AuthUserServiceImplConstants.NO_USER_FOUND_BY_USERNAME;
+
 @Slf4j
 @Component
 public class TemporaryProfileImagesServiceImpl implements TemporaryProfileImagesService {
@@ -24,10 +27,10 @@ public class TemporaryProfileImagesServiceImpl implements TemporaryProfileImages
     public static final String AVATARS_API_BASE_URL = "https://ui-avatars.com/api/";
 
     private LoadingCache<String, byte[]> imagesCache;
-    private final AuthUserService authUserService;
+    private final AuthUserRepository authUserRepository;
 
-    public TemporaryProfileImagesServiceImpl(AuthUserService authUserService) {
-        this.authUserService = authUserService;
+    public TemporaryProfileImagesServiceImpl(AuthUserRepository authUserRepository) {
+        this.authUserRepository = authUserRepository;
         initializeCache();
     }
 
@@ -50,7 +53,8 @@ public class TemporaryProfileImagesServiceImpl implements TemporaryProfileImages
         try {
             byte[] image = imagesCache.get(username);
             if (image.length == 0) {
-                AuthUserEntity authUser = this.authUserService.findByUsername(username);
+                AuthUserEntity authUser = this.authUserRepository.findByUsername(username)
+                        .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_BY_USERNAME));
                 String url = buildUrlToUiAvatars(authUser.getFirstName(), authUser.getLastName());
                 image = load(url);
                 imagesCache.put(username, image);
