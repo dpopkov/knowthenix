@@ -4,20 +4,34 @@ import io.dpopkov.knowthenix.domain.entities.question.QuestionEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionTextEntity;
 import io.dpopkov.knowthenix.domain.enums.Language;
 import io.dpopkov.knowthenix.domain.enums.TextType;
+import io.dpopkov.knowthenix.domain.repositories.AppUserRepository;
 import io.dpopkov.knowthenix.services.dto.CategoryDto;
 import io.dpopkov.knowthenix.services.dto.QuestionDto;
 import io.dpopkov.knowthenix.services.dto.TranslationDto;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 class QuestionDtoToEntityTest extends ConvertersTestConstants {
 
-    private final QuestionDtoToEntity converter = new QuestionDtoToEntity(
-            new CategoryDtoToEntity(),
-            new TranslationDtoToQuestionTextEntity());
+    @Mock
+    AppUserRepository appUserRepository;
+
+    private QuestionDtoToEntity converter;
+
+    @BeforeEach
+    void setUp() {
+        converter = new QuestionDtoToEntity(
+                new CategoryDtoToEntity(appUserRepository),
+                new TranslationDtoToQuestionTextEntity());
+    }
 
     @Test
     void convert() {

@@ -5,13 +5,13 @@ import io.dpopkov.knowthenix.domain.repositories.CategoryRepository;
 import io.dpopkov.knowthenix.services.CategoryService;
 import io.dpopkov.knowthenix.services.AppServiceException;
 import io.dpopkov.knowthenix.services.dto.CategoryDto;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
+import io.dpopkov.knowthenix.services.dto.converters.CategoryDtoToEntity;
+import io.dpopkov.knowthenix.services.dto.converters.CategoryEntityToDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,30 +19,36 @@ import java.util.Optional;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryDtoToEntity categoryDtoToEntity;
+    private final CategoryEntityToDto categoryEntityToDto;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryDtoToEntity categoryDtoToEntity,
+                               CategoryEntityToDto categoryEntityToDto) {
         this.categoryRepository = categoryRepository;
+        this.categoryDtoToEntity = categoryDtoToEntity;
+        this.categoryEntityToDto = categoryEntityToDto;
     }
 
     @Override
     public CategoryDto create(CategoryDto dto) {
-        ModelMapper mapper = new ModelMapper();
-        CategoryEntity entity = mapper.map(dto, CategoryEntity.class);
+        CategoryEntity entity = categoryDtoToEntity.convert(dto);
         CategoryEntity created = categoryRepository.save(entity);
-        return mapper.map(created, CategoryDto.class);
+        return categoryEntityToDto.convert(created);
     }
 
     @Override
     public CategoryDto getById(Long id) {
         CategoryEntity entity = categoryRepository.findById(id)
                 .orElseThrow(() -> new AppServiceException("Category not found"));
-        return new ModelMapper().map(entity, CategoryDto.class);
+        return categoryEntityToDto.convert(entity);
     }
 
     @Override
     public List<CategoryDto> getAll() {
-        Type typeOfList = new TypeToken<List<CategoryDto>>() {}.getType();
-        return new ModelMapper().map(categoryRepository.findAll(), typeOfList);
+        Iterable<CategoryEntity> all = categoryRepository.findAll();
+        List<CategoryDto> list = new ArrayList<>();
+        all.forEach(e -> list.add(categoryEntityToDto.convert(e)));
+        return list;
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
@@ -56,7 +62,7 @@ public class CategoryServiceImpl implements CategoryService {
         entity.setName(dto.getName());
         entity.setDescription(dto.getDescription());
         CategoryEntity saved = categoryRepository.save(entity);
-        return new ModelMapper().map(saved, CategoryDto.class);
+        return categoryEntityToDto.convert(saved);
     }
 
     @Override

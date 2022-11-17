@@ -4,6 +4,7 @@ import io.dpopkov.knowthenix.domain.entities.KeyTermEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionEntity;
 import io.dpopkov.knowthenix.domain.entities.question.QuestionTextEntity;
 import io.dpopkov.knowthenix.domain.enums.Language;
+import io.dpopkov.knowthenix.domain.repositories.AppUserRepository;
 import io.dpopkov.knowthenix.domain.repositories.KeyTermRepository;
 import io.dpopkov.knowthenix.domain.repositories.QuestionRepository;
 import io.dpopkov.knowthenix.domain.repositories.QuestionTextRepository;
@@ -40,6 +41,8 @@ class QuestionServiceImplTest {
     QuestionTextRepository questionTextRepository;
     @Mock
     KeyTermRepository keyTermRepository;
+    @Mock
+    AppUserRepository appUserRepository;
     QuestionServiceImpl service;
     @Captor
     ArgumentCaptor<QuestionEntity> questionEntityCaptor;
@@ -47,7 +50,7 @@ class QuestionServiceImplTest {
     @BeforeEach
     void setupService() {
         final QuestionDtoToEntity questionDtoToEntity = new QuestionDtoToEntity(
-                new CategoryDtoToEntity(), new TranslationDtoToQuestionTextEntity());
+                new CategoryDtoToEntity(appUserRepository), new TranslationDtoToQuestionTextEntity());
         service = new QuestionServiceImpl(questionRepository, questionTextRepository,
                 new QuestionEntityToDto(new CategoryEntityToDto(), new QuestionTextEntityToDto()), questionDtoToEntity,
                 new TranslationDtoToQuestionTextEntity(), new QuestionTextEntityToDto(), keyTermRepository);

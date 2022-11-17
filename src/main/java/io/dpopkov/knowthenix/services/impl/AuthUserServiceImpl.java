@@ -1,6 +1,7 @@
 package io.dpopkov.knowthenix.services.impl;
 
 import io.dpopkov.knowthenix.config.FileConstants;
+import io.dpopkov.knowthenix.domain.entities.user.AppUserEntity;
 import io.dpopkov.knowthenix.domain.entities.user.AuthUserEntity;
 import io.dpopkov.knowthenix.domain.entities.user.Role;
 import io.dpopkov.knowthenix.domain.repositories.AuthUserRepository;
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static io.dpopkov.knowthenix.security.SecurityMessages.USER_NOT_FOUND_BY_USERNAME;
-import static io.dpopkov.knowthenix.services.impl.AuthUserServiceImplConstants.*;
+import static io.dpopkov.knowthenix.services.impl.ServiceConstants.*;
 
 @Slf4j
 @Transactional
@@ -100,53 +101,55 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     public AuthUserDto registerWithRole(String firstName, String lastName, String username, String email, Role role)
             throws UsernameExistsException, EmailExistsException {
         validateNewUsernameAndEmail(username, email);
-        AuthUserEntity newUser = AuthUserEntity.builder()
-                .publicId(generatePublicId())
-                .firstName(firstName)
-                .lastName(lastName)
-                .username(username)
-                .encryptedPassword(encodePassword(generatePassword()))
-                .email(email)
-                .profileImageUrl(getTemporaryProfileImageUrl(username))
-                .joinDate(new Date())
-                .role(role)
-                .authorities(role.getAuthoritiesAsList())
-                .active(true)
-                .notLocked(true)
-                .build();
+        AuthUserEntity newUser = buildNewUser(firstName, lastName, username, email, role,
+                true, true, getTemporaryProfileImageUrl(username));
         AuthUserEntity savedUser = userRepository.save(newUser);
         AuthUserDto userDto = convertToRegisteredDto(savedUser);
-        log.trace("Saved registered user '{}'", userDto.getUsername());
+        log.trace("Return saved registered user: '{}'", userDto.getUsername());
         return userDto;
     }
 
     @Override
     public AuthUserDto addNewUser(String firstName, String lastName, String username, String email, String role,
-                                     boolean isNotLocked, boolean isActive, MultipartFile profileImage)
+                                     boolean notLocked, boolean active, MultipartFile profileImage)
             throws EmailExistsException, UsernameExistsException, IOException {
         validateNewUsernameAndEmail(username, email);
         Role userRole = Role.valueOf(role.toUpperCase());
-        AuthUserEntity newUser = AuthUserEntity.builder()
-                .publicId(generatePublicId())
+        AuthUserEntity newUser = buildNewUser(firstName, lastName, username, email, userRole,
+                notLocked, active, hasImage(profileImage) ? null : getTemporaryProfileImageUrl(username));
+        AuthUserEntity savedUser = userRepository.save(newUser);
+        if (hasImage(profileImage)) {
+            saveProfileImage(savedUser, profileImage);
+        }
+        // todo: use email service to send notification by email
+        AuthUserDto savedDto = convertToDtoWithAbsoluteUrl(savedUser);
+        log.trace("Return saved new user: '{}'", savedDto.getUsername());
+        return savedDto;
+    }
+
+    private AuthUserEntity buildNewUser(String firstName, String lastName, String username, String email,
+                                        Role userRole, boolean isNotLocked, boolean isActive,
+                                        String profileImageUrl) {
+        String publicId = generatePublicId();
+        AppUserEntity appUser = new AppUserEntity();
+        appUser.setPublicId(publicId);
+        appUser.setUsername(username);
+        appUser.setFullName(firstName + " " + lastName);
+        return AuthUserEntity.builder()
+                .publicId(publicId)
                 .firstName(firstName)
                 .lastName(lastName)
                 .username(username)
                 .encryptedPassword(encodePassword(generatePassword()))
                 .email(email)
-                .profileImageUrl(hasImage(profileImage) ? null : getTemporaryProfileImageUrl(username))
+                .profileImageUrl(profileImageUrl)
                 .joinDate(new Date())
                 .role(userRole)
                 .authorities(userRole.getAuthoritiesAsList())
                 .active(isActive)
                 .notLocked(isNotLocked)
+                .appUserEntity(appUser)
                 .build();
-        AuthUserEntity savedUser = userRepository.save(newUser);
-        if (hasImage(profileImage)) {
-            saveProfileImage(savedUser, profileImage);
-        }
-        log.trace("Saved new user '{}'", savedUser.getUsername());
-        // todo: use email service to send notification by email
-        return convertToDtoWithAbsoluteUrl(savedUser);
     }
 
     @Override
@@ -168,8 +171,9 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
         if (hasImage(profileImage)) {
             saveProfileImage(savedUser, profileImage);
         }
-        log.trace("Saved updated user '{}'", savedUser.getUsername());
-        return convertToDtoWithAbsoluteUrl(savedUser);
+        AuthUserDto savedDto = convertToDtoWithAbsoluteUrl(savedUser);
+        log.trace("Return saved updated user: '{}'", savedDto.getUsername());
+        return savedDto;
     }
 
     @Override

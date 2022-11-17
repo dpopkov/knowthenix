@@ -4,6 +4,7 @@ import io.dpopkov.knowthenix.domain.entities.ModifiableEntity;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 
@@ -13,7 +14,6 @@ import javax.validation.constraints.NotBlank;
  * All entities that should have 'owner', 'creator', or 'editor'
  * must reference instances of this class.
  *
- * Not implemented yet:
  * For purposes of authentication and authorization the {@link AuthUserEntity} should be used.
  */
 @Getter
@@ -21,10 +21,24 @@ import javax.validation.constraints.NotBlank;
 @Entity(name = "app_user")
 public class AppUserEntity extends ModifiableEntity {
 
-    @NotBlank(message ="name cannot be blank.")
+    /* New fields related to AuthUserEntity */
+
+    @Column(nullable = false, unique = true)
+    private String publicId;
+
+    @Column(nullable = false, unique = true)
+    private String username;
+
+    @NotBlank(message ="full name cannot be blank.")
+    private String fullName;
+
+    /* Old fields */
+    // todo: must be removed when the migration is complete.
+
+//    @NotBlank(message ="name cannot be blank.")
     private String name;
 
-    @NotBlank(message="password cannot be blank.")
+//    @NotBlank(message="password cannot be blank.")
     private String password;
 
     /* When user is deleted it is archived actually. */

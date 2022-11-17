@@ -7,6 +7,7 @@ import io.dpopkov.knowthenix.services.dto.CategoryDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,10 +27,12 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto category) {
+    public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto category,
+                                                      @AuthenticationPrincipal Object principal) {
         if (anyFieldIsMissing(category.getName())) {
             throw new AppControllerException(ErrorMessages.MISSING_REQUIRED_FIELD);
         }
+        category.setCreatedBy(principal.toString());
         CategoryDto created = categoryService.create(category);
         log.debug("Created category {}", created);
         return new ResponseEntity<>(created, HttpStatus.CREATED);

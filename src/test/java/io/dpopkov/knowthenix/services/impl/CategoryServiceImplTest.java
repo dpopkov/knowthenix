@@ -4,6 +4,8 @@ import io.dpopkov.knowthenix.domain.entities.question.CategoryEntity;
 import io.dpopkov.knowthenix.domain.repositories.CategoryRepository;
 import io.dpopkov.knowthenix.services.AppServiceException;
 import io.dpopkov.knowthenix.services.dto.CategoryDto;
+import io.dpopkov.knowthenix.services.dto.converters.CategoryDtoToEntity;
+import io.dpopkov.knowthenix.services.dto.converters.CategoryEntityToDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -29,6 +31,10 @@ class CategoryServiceImplTest {
 
     @Mock
     CategoryRepository categoryRepository;
+    @Mock
+    CategoryDtoToEntity categoryDtoToEntity;
+    @Mock
+    CategoryEntityToDto categoryEntityToDto;
     @InjectMocks
     CategoryServiceImpl service;
     @Captor
@@ -37,28 +43,16 @@ class CategoryServiceImplTest {
     @Test
     void create() {
         // Given
-        given(categoryRepository.save(any(CategoryEntity.class))).willReturn(new CategoryEntity());
+        given(categoryDtoToEntity.convert(any())).willReturn(new CategoryEntity(CATEGORY_NAME));
+        given(categoryRepository.save(any())).willReturn(new CategoryEntity(CATEGORY_NAME));
         CategoryDto dto = new CategoryDto(CATEGORY_NAME, CATEGORY_DESCRIPTION);
+        given(categoryEntityToDto.convert(any())).willReturn(dto);
         // When
         CategoryDto created = service.create(dto);
         // Then
         assertNotNull(created);
         then(categoryRepository).should().save(entityCaptor.capture());
         assertEquals(CATEGORY_NAME, entityCaptor.getValue().getName());
-    }
-
-    @Test
-    void getById() {
-        // Given
-        CategoryEntity entity = new CategoryEntity();
-        entity.setId(CATEGORY_ID);
-        given(categoryRepository.findById(CATEGORY_ID)).willReturn(Optional.of(entity));
-        // When
-        CategoryDto dto = service.getById(CATEGORY_ID);
-        // Then
-        assertNotNull(dto);
-        assertEquals(CATEGORY_ID, dto.getId());
-        then(categoryRepository).should().findById(CATEGORY_ID);
     }
 
     @Test
@@ -79,22 +73,6 @@ class CategoryServiceImplTest {
         assertNotNull(all);
         assertEquals(2, all.size());
         then(categoryRepository).should().findAll();
-    }
-
-    @Test
-    void update() {
-        // Given
-        CategoryEntity entity = new CategoryEntity();
-        entity.setId(CATEGORY_ID);
-        CategoryDto dto = new CategoryDto();
-        dto.setId(CATEGORY_ID);
-        given(categoryRepository.findById(CATEGORY_ID)).willReturn(Optional.of(entity));
-        given(categoryRepository.save(any())).willReturn(new CategoryEntity());
-        // When
-        CategoryDto updated = service.update(dto);
-        // Then
-        assertNotNull(updated);
-        then(categoryRepository).should().save(entity);
     }
 
     @Test

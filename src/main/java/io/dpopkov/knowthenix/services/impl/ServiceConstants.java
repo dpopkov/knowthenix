@@ -1,6 +1,6 @@
 package io.dpopkov.knowthenix.services.impl;
 
-public class AuthUserServiceImplConstants {
+public class ServiceConstants {
 
     public static final int PUBLIC_ID_LENGTH = 16;
     public static final int GENERATED_PASSWORD_LENGTH = 16;

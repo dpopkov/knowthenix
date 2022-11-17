@@ -10,4 +10,10 @@ import lombok.*;
 public class CategoryDto extends BaseDto {
     private String name;
     private String description;
+    private String createdBy;
+
+    public CategoryDto(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 }

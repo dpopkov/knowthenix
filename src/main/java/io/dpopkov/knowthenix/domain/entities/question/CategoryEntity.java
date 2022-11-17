@@ -1,11 +1,14 @@
 package io.dpopkov.knowthenix.domain.entities.question;
 
 import io.dpopkov.knowthenix.domain.entities.ModifiableEntity;
+import io.dpopkov.knowthenix.domain.entities.user.AppUserEntity;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotEmpty;
 
 @Getter
@@ -17,6 +20,8 @@ public class CategoryEntity extends ModifiableEntity {
     @Column(nullable = false, unique = true)
     private String name;
     private String description;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private AppUserEntity createdBy;
 
     public CategoryEntity() {
     }

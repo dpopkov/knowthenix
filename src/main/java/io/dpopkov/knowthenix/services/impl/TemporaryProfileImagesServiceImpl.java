@@ -18,7 +18,7 @@ import java.net.URL;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static io.dpopkov.knowthenix.services.impl.AuthUserServiceImplConstants.NO_USER_FOUND_BY_USERNAME;
+import static io.dpopkov.knowthenix.services.impl.ServiceConstants.NO_USER_FOUND_BY_USERNAME;
 
 @Slf4j
 @Component

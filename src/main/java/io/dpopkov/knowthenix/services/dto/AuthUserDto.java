@@ -21,6 +21,6 @@ public class AuthUserDto {
     private Date lastLoginDateDisplay;
     private String role;
     private Collection<String> authorities;
-    private String active;
-    private String notLocked;
+    private boolean active;
+    private boolean notLocked;
 }

@@ -48,6 +48,9 @@ public class AuthUserEntity extends ModifiableEntity {
     /** When user is "deleted" it should be archived actually. */
     private boolean archived;
 
+    @OneToOne(cascade = {CascadeType.PERSIST})
+    private AppUserEntity appUserEntity;
+
     public boolean isNotSameById(AuthUserEntity other) {
         return other == null || getId() == null || !getId().equals(other.getId());
     }
