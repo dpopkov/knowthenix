@@ -12,10 +12,11 @@ import java.util.List;
 public interface AuthUserService {
 
     /** Used in case when a user is not logged in and needs to register itself. */
-    AuthUserDto register(String firstName, String lastName, String username, String email)
+    AuthUserDto register(String firstName, String lastName, String username, String email, String password)
             throws UsernameExistsException, EmailExistsException;
 
-    AuthUserDto registerWithRole(String firstName, String lastName, String username, String email, Role role)
+    AuthUserDto registerWithRole(String firstName, String lastName, String username, String email, Role role,
+                                 String password)
             throws UsernameExistsException, EmailExistsException;
 
     List<AuthUserDto> getAllUsers();

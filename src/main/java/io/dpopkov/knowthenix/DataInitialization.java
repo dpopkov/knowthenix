@@ -130,8 +130,8 @@ public class DataInitialization {
 
         log.debug("initData saved {} answers", answerRepository.count());
 
-        authUserService.registerWithRole("Jane", "Doe", "jane", "jane@example.org",
-                Role.ROLE_SUPER_ADMIN);
+        authUserService.registerWithRole("Jane", "Doe", "admin", "jane@example.org",
+                Role.ROLE_SUPER_ADMIN, "admin");
         log.debug("initData registered 1 user");
 
         log.debug("initData finished");

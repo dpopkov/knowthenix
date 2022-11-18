@@ -2,7 +2,7 @@
 ```shell script
 curl -X POST -H 'Content-Type: application/json' -d @register-data.json http://localhost:8080/user/register
 ```
-or
+or register without provided password
 ```shell script
 curl  --request POST 'http://localhost:8080/user/register' \
 --header 'Content-Type: application/json' \
@@ -10,6 +10,18 @@ curl  --request POST 'http://localhost:8080/user/register' \
     "firstName":"Jane",
     "lastName":"Doe",
     "username":"jane",
+    "email":"jane@example.org"
+}'
+```
+or register with provided password
+```shell script
+curl  --request POST 'http://localhost:8080/user/register' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "firstName":"Jane",
+    "lastName":"Doe",
+    "username":"jane",
+    "password":"<password-value>",
     "email":"jane@example.org"
 }'
 ```

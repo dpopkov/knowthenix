@@ -94,17 +94,18 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     }
 
     @Override
-    public AuthUserDto register(String firstName, String lastName, String username, String email)
+    public AuthUserDto register(String firstName, String lastName, String username, String email, String password)
             throws UsernameExistsException, EmailExistsException {
-        return registerWithRole(firstName, lastName, username, email, Role.defaultRole());
+        return registerWithRole(firstName, lastName, username, email, Role.defaultRole(), password);
     }
 
     @Override
-    public AuthUserDto registerWithRole(String firstName, String lastName, String username, String email, Role role)
+    public AuthUserDto registerWithRole(String firstName, String lastName, String username, String email, Role role,
+                                        String password)
             throws UsernameExistsException, EmailExistsException {
         validateNewUsernameAndEmail(username, email);
         AuthUserEntity newUser = buildNewUser(firstName, lastName, username, email, role,
-                true, true, getTemporaryProfileImageUrl(username));
+                true, true, getTemporaryProfileImageUrl(username), password);
         AuthUserEntity savedUser = userRepository.save(newUser);
         AuthUserDto userDto = convertToRegisteredDto(savedUser);
         log.trace("Return saved registered user: '{}'", userDto.getUsername());
@@ -118,7 +119,7 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
         validateNewUsernameAndEmail(username, email);
         Role userRole = Role.valueOf(role.toUpperCase());
         AuthUserEntity newUser = buildNewUser(firstName, lastName, username, email, userRole,
-                notLocked, active, hasImage(profileImage) ? null : getTemporaryProfileImageUrl(username));
+                notLocked, active, hasImage(profileImage) ? null : getTemporaryProfileImageUrl(username), null);
         AuthUserEntity savedUser = userRepository.save(newUser);
         if (hasImage(profileImage)) {
             saveProfileImage(savedUser, profileImage);
@@ -131,18 +132,24 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
 
     private AuthUserEntity buildNewUser(String firstName, String lastName, String username, String email,
                                         Role userRole, boolean isNotLocked, boolean isActive,
-                                        String profileImageUrl) {
+                                        String profileImageUrl, String password) {
         String publicId = generatePublicId();
         AppUserEntity appUser = new AppUserEntity();
         appUser.setPublicId(publicId);
         appUser.setUsername(username);
         appUser.setFullName(firstName + " " + lastName);
+        String rawPassword;
+        if (password == null || password.isBlank()) {
+            rawPassword = generatePassword();
+        } else {
+            rawPassword = password;
+        }
         return AuthUserEntity.builder()
                 .publicId(publicId)
                 .firstName(firstName)
                 .lastName(lastName)
                 .username(username)
-                .encryptedPassword(encodePassword(generatePassword()))
+                .encryptedPassword(encodePassword(rawPassword))
                 .email(email)
                 .profileImageUrl(profileImageUrl)
                 .joinDate(new Date())

@@ -55,7 +55,7 @@ public class AuthUserController {
     @PostMapping("/register")
     public ResponseEntity<AuthUserDto> register(@RequestBody RegisterUserRequest user) throws AppServiceException {
         AuthUserDto registered = authUserService.register(user.getFirstName(), user.getLastName(),
-                user.getUsername(), user.getEmail());
+                user.getUsername(), user.getEmail(), user.getPassword());
         // todo: fix this line below - the actual entity should not be sent as response!
         return new ResponseEntity<>(registered, HttpStatus.CREATED);
     }
