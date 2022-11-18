@@ -1,5 +1,7 @@
 package io.dpopkov.knowthenix.services.impl;
 
+import static io.dpopkov.knowthenix.config.FileConstants.USER_IMAGE_PATH;
+
 public class ServiceConstants {
 
     public static final int PUBLIC_ID_LENGTH = 16;
@@ -8,6 +10,6 @@ public class ServiceConstants {
     public static final String USERNAME_ALREADY_EXISTS = "Username already exists";
     public static final String EMAIL_ALREADY_EXISTS = "Email already exists";
     public static final String NO_USER_FOUND_BY_EMAIL = "No user found by email";
-    public static final String DEFAULT_USER_IMAGE_PATH = "/user/image/profile/";
+    public static final String DEFAULT_USER_IMAGE_PATH = USER_IMAGE_PATH + "profile/";
     public static final String NOT_AN_IMAGE_FILE = " is not an image file. Please upload an image.";
 }

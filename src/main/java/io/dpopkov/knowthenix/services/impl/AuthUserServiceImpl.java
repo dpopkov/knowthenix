@@ -36,6 +36,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static io.dpopkov.knowthenix.config.FileConstants.USER_IMAGE_PATH;
 import static io.dpopkov.knowthenix.security.SecurityMessages.USER_NOT_FOUND_BY_USERNAME;
 import static io.dpopkov.knowthenix.services.impl.ServiceConstants.*;
 
@@ -51,6 +52,7 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     private final PasswordEncoder passwordEncoder;
     private final LoginAttemptService loginAttemptService;
     private final AuthUserEntityToDto authUserEntityToDto;
+    private volatile String absoluteProfileImagePrefix;
 
     public AuthUserServiceImpl(AuthUserRepository authUserRepository, PasswordEncoder passwordEncoder,
                                LoginAttemptService loginAttemptService, AuthUserEntityToDto authUserEntityToDto) {
@@ -228,7 +230,7 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     }
 
     private String profileImageUrl(String username, String extension) {
-        return FileConstants.USER_IMAGE_PATH + username + "/" + username + "." + extension;
+        return USER_IMAGE_PATH + username + "/" + username + "." + extension;
     }
 
     private void saveProfileImage(AuthUserEntity user, MultipartFile profileImage)
@@ -349,10 +351,24 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     }
 
     private AuthUserDto convertToDtoWithAbsoluteUrl(AuthUserEntity entity) {
+        final String relativeUrl = entity.getProfileImageUrl();
         AuthUserDto userDto = authUserEntityToDto.convert(entity);
-        String absoluteUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(entity.getProfileImageUrl())
-                .toUriString();
+        String absoluteUrl;
+        if (absoluteProfileImagePrefix != null) {
+            absoluteUrl = absoluteProfileImagePrefix + relativeUrl;
+        } else {
+            synchronized(this) {
+                if (absoluteProfileImagePrefix == null) {
+                    absoluteUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                            .path(relativeUrl)
+                            .toUriString();
+                    int startOfRelative = absoluteUrl.indexOf(USER_IMAGE_PATH);
+                    absoluteProfileImagePrefix = absoluteUrl.substring(0, startOfRelative);
+                } else {
+                    absoluteUrl = absoluteProfileImagePrefix + relativeUrl;
+                }
+            }
+        }
         assert userDto != null;
         userDto.setProfileImageUrl(absoluteUrl);
         return userDto;
