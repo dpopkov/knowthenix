@@ -2,6 +2,14 @@
 
 The application is under development.
 
+* [General Info](#general-info)
+* [Used Technologies](#used-technologies)
+* [How to Launch](#how-to-launch)
+* [Screenshots](#screenshots)
+* [Database Schema](#database-schema)
+* [Custom application properties and profiles](#custom-application-properties-and-profiles)
+* [Curl requests](#curl-requests)
+
 ### General Info
 
 The application serves to maintain the Knowledge Base filled by authorized users.
@@ -34,12 +42,28 @@ They need to be tested and clarified.
     * start front-end [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang).
     * or run curl, httpie, Postman or other client.
 
-### TODO: describe custom application properties and profiles
+### Screenshots
 
-### TODO: describe curl requests
+Screenshots are taken from front-end project [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang)
 
-### TODO: Screenshots
+|  |  |
+| ------------- | ------------- |
+| <img align="center" src="docs/images/ui-01-register.png" /> | <img align="center" src="docs/images/ui-02-login.png" /> |
+| Registration page. If password is not provided, it will be generated. | Login page. Number of login attempts is limited, then user is locked. |
+| <img align="center" src="docs/images/ui-03-users.png" /> | <img align="center" src="docs/images/ui-04-settings.png" /> |
+| List of all users. | Resetting user password. | 
+| <img align="center" src="docs/images/ui-05-edit-user.png" /> | <img align="center" src="docs/images/ui-06-profile.png" /> |
+| Edit user. | Profile of current user. |
+
+The rest of screenshots for categories, questions, keyterms and sources will be added later.
+
+### Database Schema
 Will be added later.
 
-### TODO: Database Schema
+### Custom application properties and profiles
 Will be added later.
+
+### Curl requests
+Will be added later.
+
+[Top](#knowthenix)
