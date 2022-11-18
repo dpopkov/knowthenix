@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static io.dpopkov.knowthenix.config.FileConstants.USER_IMAGE_PATH;
 import static io.dpopkov.knowthenix.security.SecurityMessages.USER_NOT_FOUND_BY_USERNAME;
@@ -186,11 +185,25 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     }
 
     @Override
-    public void deleteUserByUsername(String username) throws IOException {
-        // todo: implement archiving user instead of deleting
+    public void deleteUserByUsername(String username) {
+        AuthUserEntity authUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_BY_USERNAME));
+        authUser.setArchived(true);
+        authUser.setNotLocked(false);
+        authUser.setActive(false);
+        AppUserEntity appUser = authUser.getAppUserEntity();
+        if (appUser != null) {
+            appUser.setArchived(true);
+        }
+        userRepository.save(authUser);
+        log.trace("User deleted (archived) by username {}", username);
+    }
+
+    public void deleteUserPermanentlyByUsername(String username) throws IOException {
+        // todo: delete the app user associated with this authUser in the first place
         userRepository.deleteByUsername(username);
         deleteUserImage(username);
-        log.trace("User deleted by username {}", username);
+        log.trace("User deleted permanently by username {}", username);
     }
 
     private void deleteUserImage(String username) throws IOException {
@@ -323,7 +336,7 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
 
     @Override
     public List<AuthUserDto> getAllUsers() {
-        return StreamSupport.stream(userRepository.findAll().spliterator(), false)
+        return userRepository.findAllByArchivedFalse().stream()
                 .map(this::convertToDtoWithAbsoluteUrl)
                 .collect(Collectors.toList());
     }

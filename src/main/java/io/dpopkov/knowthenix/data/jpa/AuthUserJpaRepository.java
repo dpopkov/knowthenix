@@ -5,6 +5,7 @@ import io.dpopkov.knowthenix.domain.repositories.AuthUserRepository;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -13,6 +14,8 @@ public interface AuthUserJpaRepository extends AuthUserRepository, CrudRepositor
     Optional<AuthUserEntity> findByUsername(String username);
 
     Optional<AuthUserEntity> findByEmail(String email);
+
+    List<AuthUserEntity> findAllByArchivedFalse();
 
     void deleteByUsername(String username);
 }
