@@ -4,7 +4,7 @@ The application is under development.
 
 * [General Info](#general-info)
 * [Used Technologies](#used-technologies)
-* [How to Launch](#how-to-launch)
+* [How to Launch Manually](#how-to-launch-manually)
 * [Screenshots](#screenshots)
 * [Database Schema](#database-schema)
 * [Custom application properties and profiles](#custom-application-properties-and-profiles)
@@ -25,26 +25,31 @@ This Knowledge Base is planned for later use as a source for generating records 
     * Spring Data JPA
     * Spring MVC
     * H2 database
-    * MySQL, PostgreSQL (not configured yet)
+    * PostgreSQL (or other RDBMS with provided drivers)
 * Front-end
     * [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang) - project built using Angular.
 
-### How to Launch
+### How to Launch Manually
 This section is not finished yet. These instructions are mostly for personal use.
 There is no guarantee that they will produce expected result on any machine.
 They need to be tested and clarified.
-* Build: `mvn package`
-* Create database: this step will be clarified after configuring non-H2 database
-* Create schema: this step will be clarified after configuring non-H2 database
-* Test connection: this step will be clarified after configuring non-H2 database
-* Run: `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=dev`
+* Build: `mvn clean package`
+* Create database in PostgreSQL: `create database knowthenix-prod`
+* Provide environment variables for passing credentials to the application:
+    * `KNOWTHENIX_ADMIN=<enter-db-user-name>`
+    * `KNOWTHENIX_ADMIN_PASSWORD=<enter-db-user-password>`
+* Test connection `jdbc:postgresql://localhost:5432/knowthenix-prod` using any SQL client.
+* Run for the first time to populate with some initial data: 
+    * `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=prod --spring.sql.init.mode=always --spring.app.data.init=true`
+* Run after initializing or run with empty db: 
+    * `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=prod`
 * Use: 
     * start front-end [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang).
     * or run curl, httpie, Postman or other client.
 
 ### Screenshots
 
-Screenshots are taken from front-end project [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang)
+Screenshots are taken from front-end [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang)
 
 |  |  |
 | ------------- | ------------- |

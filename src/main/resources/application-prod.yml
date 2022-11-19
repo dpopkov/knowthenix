@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/knowthenix-prod
+    username: ${KNOWTHENIX_ADMIN}
+    password: ${KNOWTHENIX_ADMIN_PASSWORD}
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      dialect: org.hibernate.dialect.PostgreSQL10Dialect
+    # After Hibernate schema creation is performed then additionally data.sql is executed to populate the db
+    defer-datasource-initialization: true
+  h2:
+    console:
+      enabled: false
+  # Set init platform H2 for using data-h2.sql script
+  sql:
+    init:
+      platform: postgres
+#      mode: always
+      mode: never
+
+# Application custom properties
+app:
+  data:
+#    init: true
+    init: false

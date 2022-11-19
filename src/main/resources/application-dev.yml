@@ -9,6 +9,7 @@ spring:
       ddl-auto: create
     # After Hibernate schema creation is performed then additionally data.sql is executed to populate the db
     defer-datasource-initialization: true
+    show-sql: true
   # Set init platform H2 for using data-h2.sql script
   sql:
     init:
