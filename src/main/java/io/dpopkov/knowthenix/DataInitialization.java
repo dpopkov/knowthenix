@@ -20,7 +20,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@Profile(Profiles.DEV)
+@Profile({Profiles.INIT, Profiles.DEV})
 @Component
 public class DataInitialization {
 
@@ -51,17 +51,31 @@ public class DataInitialization {
         }
         log.debug("initData started");
 
-        CategoryEntity categoryJava = categoryRepository.findByName("Java").orElseThrow();
-        CategoryEntity categorySpring = categoryRepository.findByName("Spring").orElseThrow();
-        CategoryEntity categoryOrm = categoryRepository.findByName("ORM").orElseThrow();
+        CategoryEntity categoryJava = new CategoryEntity("Java", "Java is a high-level, class-based, object-oriented programming language");
+        categoryRepository.save(categoryJava);
+        CategoryEntity categorySpring = new CategoryEntity("Spring", "Spring framework");
+        categoryRepository.save(categorySpring);
+        CategoryEntity categoryOrm = new CategoryEntity("ORM", "Object-Relational Mapping");
+        categoryRepository.save(categoryOrm);
+        CategoryEntity categorySql = new CategoryEntity("SQL", "Structured Query Language");
+        categoryRepository.save(categorySql);
+        log.debug("initData saved {} categories", categoryRepository.count());
 
-        KeyTermEntity keyTermJre = keyTermRepository.findByName("JRE").orElseThrow();
-        KeyTermEntity keyTermSpring = keyTermRepository.findByName("Spring").orElseThrow();
-        KeyTermEntity keyTermSpring5 = keyTermRepository.findByName("Spring 5").orElseThrow();
-        KeyTermEntity keyTermSpring6 = keyTermRepository.findByName("Spring 6").orElseThrow();
-        KeyTermEntity keyTermHibernate = keyTermRepository.findByName("Hibernate").orElseThrow();
-        KeyTermEntity keyTermOrm = keyTermRepository.findByName("ORM").orElseThrow();
-        KeyTermEntity keyTermSwing = keyTermRepository.findByName("Swing").orElseThrow();
+        KeyTermEntity keyTermJre = new KeyTermEntity("JRE", "Java Runtime Environment");
+        keyTermRepository.save(keyTermJre);
+        KeyTermEntity keyTermSpring = new KeyTermEntity("Spring", "The Spring Framework is an application framework and inversion of control container for the Java platform.");
+        keyTermRepository.save(keyTermSpring);
+        KeyTermEntity keyTermSpring5 = new KeyTermEntity("Spring 5", "Spring framework Version 5");
+        keyTermRepository.save(keyTermSpring5);
+        KeyTermEntity keyTermSpring6 = new KeyTermEntity("Spring 6", "Spring framework Version 6");
+        keyTermRepository.save(keyTermSpring6);
+        KeyTermEntity keyTermHibernate = new KeyTermEntity("Hibernate", "ORM framework for Java");
+        keyTermRepository.save(keyTermHibernate);
+        KeyTermEntity keyTermOrm = new KeyTermEntity("ORM", "Object-Relational Mapping, a software programming technique that allows accessing relational databases in the form of abstract objects");
+        keyTermRepository.save(keyTermOrm);
+        KeyTermEntity keyTermSwing = new KeyTermEntity("Swing", "Java GUI library");
+        keyTermRepository.save(keyTermSwing);
+        log.debug("initData saved {} key terms", keyTermRepository.count());
 
         QuestionEntity jre = new QuestionEntity();
         jre.addKeyTerm(keyTermJre);
