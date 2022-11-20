@@ -17,9 +17,9 @@ spring:
   # Set init platform H2 for using data-h2.sql script
   sql:
     init:
-      mode: never
+      mode: always
 
 # Application custom properties
 app:
   data:
-    init: false
+    init: true
