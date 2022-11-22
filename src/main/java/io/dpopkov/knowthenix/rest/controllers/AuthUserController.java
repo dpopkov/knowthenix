@@ -26,12 +26,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static io.dpopkov.knowthenix.config.AppConstants.*;
 import static io.dpopkov.knowthenix.domain.entities.user.Authority.*;
 import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 
 @Slf4j
 @RestController
-@RequestMapping("/user")
+@RequestMapping(USER_URL)
 public class AuthUserController {
 
     private static final String AN_EMAIL_SENT_TO = "An email with a new password sent to (not really): ";
@@ -52,15 +53,14 @@ public class AuthUserController {
         this.temporaryProfileImagesService = temporaryProfileImagesService;
     }
 
-    @PostMapping("/register")
+    @PostMapping(REGISTER_URL)
     public ResponseEntity<AuthUserDto> register(@RequestBody RegisterUserRequest user) throws AppServiceException {
         AuthUserDto registered = authUserService.register(user.getFirstName(), user.getLastName(),
                 user.getUsername(), user.getEmail(), user.getPassword());
-        // todo: fix this line below - the actual entity should not be sent as response!
         return new ResponseEntity<>(registered, HttpStatus.CREATED);
     }
 
-    @PostMapping("/login")
+    @PostMapping(LOGIN_URL)
     public ResponseEntity<AuthUserDto> login(@RequestBody LoginUserRequest user) {
         authenticate(user.getUsername(), user.getPassword());
         log.trace("User {} authenticated successfully", user.getUsername());
@@ -132,7 +132,7 @@ public class AuthUserController {
         return new ResponseEntity<>(all, HttpStatus.OK);
     }
 
-    @PutMapping("/resetPassword/{email}")
+    @PutMapping(RESET_PASSWORD_URL + "/{email}")
 //    @PreAuthorize("hasAuthority('" + USER_UPDATE + "')")
     public ResponseEntity<AppHttpResponse> resetPassword(@PathVariable("email") String email) {
         authUserService.resetPassword(email);
@@ -146,18 +146,18 @@ public class AuthUserController {
         return new ResponseEntity<>(new AppHttpResponse(HttpStatus.OK, USER_DELETED_SUCCESSFULLY), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/image/profile/{username}", produces = IMAGE_PNG_VALUE)
+    @GetMapping(path = IMAGE_PROFILE_URL + "/{username}", produces = IMAGE_PNG_VALUE)
     public byte[] getTemporaryProfileImage(@PathVariable String username) {
         return temporaryProfileImagesService.getImage(username);
     }
 
-    @GetMapping(path = "/image/{username}/{filename}", produces = IMAGE_PNG_VALUE)
+    @GetMapping(path = IMAGE_URL + "/{username}/{filename}", produces = IMAGE_PNG_VALUE)
     public byte[] getProfileImage(@PathVariable String username, @PathVariable String filename) throws IOException {
         // todo: move all operations with images to image service
         return Files.readAllBytes(Paths.get(FileConstants.USER_FOLDER, username, filename));
     }
 
-    @PutMapping("/updateProfileImage")
+    @PutMapping(UPDATE_PROFILE_IMAGE_URL)
     public ResponseEntity<AuthUserDto> updateProfileImage(@RequestParam String username,
                                                              @RequestParam(value = "profileImage") MultipartFile image)
             throws IOException {

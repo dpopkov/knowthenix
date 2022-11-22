@@ -10,4 +10,13 @@ public class AppConstants {
     public static final String SOURCES_URL = API + "/sources";
     public static final String USERS_URL = API + "/users";
     public static final String BASIC_AUTH_URL = API + "/basicAuth";
+
+    /* Security-2 user urls. */
+    public static final String USER_URL = "/user";
+    public static final String REGISTER_URL = "/register";
+    public static final String LOGIN_URL = "/login";
+    public static final String RESET_PASSWORD_URL = "/resetPassword";
+    public static final String IMAGE_URL = "/image";
+    public static final String IMAGE_PROFILE_URL = IMAGE_URL + "/profile";
+    public static final String UPDATE_PROFILE_IMAGE_URL = "/updateProfileImage";
 }
