@@ -51,6 +51,7 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
     private final PasswordEncoder passwordEncoder;
     private final LoginAttemptService loginAttemptService;
     private final AuthUserEntityToDto authUserEntityToDto;
+
     private volatile String absoluteProfileImagePrefix;
 
     public AuthUserServiceImpl(AuthUserRepository authUserRepository, PasswordEncoder passwordEncoder,
@@ -59,6 +60,10 @@ public class AuthUserServiceImpl implements AuthUserService, UserDetailsService 
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
         this.authUserEntityToDto = authUserEntityToDto;
+    }
+
+    public void setAbsoluteProfileImagePrefix(String absoluteProfileImagePrefix) {
+        this.absoluteProfileImagePrefix = absoluteProfileImagePrefix;
     }
 
     @Override
