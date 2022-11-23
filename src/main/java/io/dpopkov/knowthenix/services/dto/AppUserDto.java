@@ -8,13 +8,14 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-public class AppUserDto extends BaseDto {
-    private String name;
+public class AppUserDto {
+    private String publicId;
+    private String fullName;
 
     public static AppUserDto from(AppUserEntity userEntity) {
         AppUserDto user = new AppUserDto();
-        user.setId(userEntity.getId());
-        user.setName(userEntity.getName());
+        user.setPublicId(userEntity.getPublicId());
+        user.setFullName(userEntity.getFullName());
         return user;
     }
 }

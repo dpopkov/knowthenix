@@ -32,15 +32,6 @@ public class AppUserEntity extends ModifiableEntity {
     @NotBlank(message ="full name cannot be blank.")
     private String fullName;
 
-    /* Old fields */
-    // todo: must be removed when the migration is complete.
-
-//    @NotBlank(message ="name cannot be blank.")
-    private String name;
-
-//    @NotBlank(message="password cannot be blank.")
-    private String password;
-
     /* When user is deleted it is archived actually. */
     private boolean archived;
 }
