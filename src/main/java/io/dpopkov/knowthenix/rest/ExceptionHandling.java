@@ -57,12 +57,12 @@ public class ExceptionHandling {
 
     @ExceptionHandler(EmailExistsException.class)
     public ResponseEntity<AppHttpResponse> emailExistsException(EmailExistsException exception) {
-        return createResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
+        return createResponse(HttpStatus.CONFLICT, exception.getMessage());
     }
 
     @ExceptionHandler(UsernameExistsException.class)
     public ResponseEntity<AppHttpResponse> usernameExistsException(UsernameExistsException exception) {
-        return createResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
+        return createResponse(HttpStatus.CONFLICT, exception.getMessage());
     }
 
     @ExceptionHandler(EmailNotFoundException.class)
