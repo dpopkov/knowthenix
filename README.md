@@ -1,81 +1,80 @@
 # Knowthenix
 
-_The application is under development._
+_Приложение еще не завершено. Оно находится в процессе доработки._
 
-Translations:  
-* [Russian](README_ru.md)
+На других языках:  
+* [English](README_en.md)
 
-### Contents
-* [General Info](#general-info)
-* [Used Technologies](#used-technologies)
-* [How to Launch Manually](#how-to-launch-manually)
-* [Screenshots](#screenshots)
-* [Database Schema](#database-schema)
-* [Custom application properties and profiles](#custom-application-properties-and-profiles)
-* [Curl requests](#curl-requests)
+### Содержание
+* [Общая информация](#%D0%BE%D0%B1%D1%89%D0%B0%D1%8F-%D0%B8%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F)
+* [Используемые технологии](#%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D0%BC%D1%8B%D0%B5-%D1%82%D0%B5%D1%85%D0%BD%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D0%B8)
+* [Как запустить вручную](#%D0%BA%D0%B0%D0%BA-%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D1%82%D0%B8%D1%82%D1%8C-%D0%B2%D1%80%D1%83%D1%87%D0%BD%D1%83%D1%8E)
+* [Скриншоты](#%D1%81%D0%BA%D1%80%D0%B8%D0%BD%D1%88%D0%BE%D1%82%D1%8B)
+* [Схема БД](#%D1%81%D1%85%D0%B5%D0%BC%D0%B0-%D0%B1%D0%B4)
+* [Пользовательские аттрибуты приложения и профили](#%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%B8%D0%B5-%D0%B0%D1%82%D1%82%D1%80%D0%B8%D0%B1%D1%83%D1%82%D1%8B-%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F-%D0%B8-%D0%BF%D1%80%D0%BE%D1%84%D0%B8%D0%BB%D0%B8)
+* [Запросы Curl](#%D0%B7%D0%B0%D0%BF%D1%80%D0%BE%D1%81%D1%8B-curl)
 
-### General Info
+### Общая информация
 
-The application serves to maintain the Knowledge Base filled by authorized users.
-It supports storage of units of information including matching one Question with several possible Answers using 
-different Sources.
-The text of each Question or Answer can be presented in several languages.
-This Knowledge Base is planned for later use as a source for generating records for the spaced repetition system
-(not implemented yet).
+Приложение предназначено для наполнения Базы Знаний авторизованными пользователями.
+Оно поддерживает хранение информации включая возможные варианты Ответов на Вопросы с использованием различных источников.
+Текст может быть представлен в виде нескольких переводов на различных языках.
+В дальнейшем планируется как источник для генерации записей для системы интервального повторения 
+(еще не реализована).
 
-### Used Technologies
+### Используемые технологии
 * Back-end
     * Spring Boot
     * Spring Data JPA
     * Spring MVC
     * H2 database
-    * PostgreSQL (or other RDBMS with provided drivers)
+    * PostgreSQL (или другая RDBMS)
 * Front-end
-    * [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang) - project built using Angular.
+    * [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang) - проект на Angular.
 
-### How to Launch Manually
-This section is not finished yet. These instructions are mostly for personal use.
-There is no guarantee that they will produce expected result on any machine.
-They need to be tested and clarified.
-* Build: `mvn clean package`
-* Create database in PostgreSQL or MySQL: `create database knowthenix-prod`
-* Provide environment variables for passing credentials to the application:
+### Как запустить вручную
+Эта секция еще не завершена. Данные инструкции только для персонального использования.
+Нет гарантии получения результата на любой машине.
+Нуждаются в дальнейшем тестировании и прояснении.
+* Собрать проект: `mvn clean package`
+* Создать базу данных в PostgreSQL или MySQL: `create database knowthenix-prod`
+* Создать переменные окружения для передачи имени пользователя и пароля в приложение:
     * `KNOWTHENIX_ADMIN=<enter-db-user-name>`
     * `KNOWTHENIX_ADMIN_PASSWORD=<enter-db-user-password>`
-* Test connection using any SQL client:
+* Протестировать соединение с БД используя любой SQL клиент:
     * Postgres: `jdbc:postgresql://localhost:5432/knowthenix-prod`
-    * or MySQL: `jdbc:mysql://localhost:3306/knowthenix-prod?userUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC`
-* Run for the first time to populate with some initial data: 
-    * `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=init` or `--spring.active.profile=mysqlinit`
-* Run after initializing or run with empty db: 
+    * либо MySQL: `jdbc:mysql://localhost:3306/knowthenix-prod?userUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC`
+* Запустить в первый раз для наполнения БД первичными данными: 
+    * `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=init` или `--spring.active.profile=mysqlinit`
+* Запускать впоследствии после инициализации БД, либо с пустой БД: 
     * `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=prod`
-* Use: 
-    * start front-end [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang).
-    * or run curl, httpie, Postman or other client.
+* Использование: 
+    * стартовать front-end [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang).
+    * или использовать curl, httpie, Postman или другой http клиент.
 
-### Screenshots
+### Скриншоты
 
-Screenshots are taken from front-end [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang)
+Скриншоты взяты из [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang)
 
 |  |  |
 | ------------- | ------------- |
 | <img align="center" src="docs/images/ui-01-register.png" /> | <img align="center" src="docs/images/ui-02-login.png" /> |
-| Registration page. If password is not provided, it will be generated. | Login page. Number of login attempts is limited, then user is locked. |
+| Страница регистрации. Если пароль не вводится, то он будет сгенерирован. | Страница входа. Количество попыток входа ограничено, после чего аккаунт блокируется. |
 | <img align="center" src="docs/images/ui-03-users.png" /> | <img align="center" src="docs/images/ui-04-settings.png" /> |
-| List of all users. | Resetting user password. | 
+| Список всех пользователей. | Сброс пароля пользователя. | 
 | <img align="center" src="docs/images/ui-05-edit-user.png" /> | <img align="center" src="docs/images/ui-06-profile.png" /> |
-| Edit user. | Profile of current user. |
+| Редактирование данных пользователя. | Профиль текущего пользователя. |
 
-The rest of screenshots for categories, questions, keyterms and sources will be added later.
+Остальные скриншоты для Категорий, Вопросов, Ключевых Терминов и Источников будут добавлены позже.
 
-### Database Schema
-The Entity Relationship diagram is generated in MySQL Workbench. It is not final.
+### Схема БД
+Диаграмма сгенерирована в MySQL Workbench и не является окончательной.
 ![DB Schema](docs/images/db-schema.png)
 
-### Custom application properties and profiles
-Will be added later.
+### Пользовательские аттрибуты приложения и профили
+Будет добавлена позже.
 
-### Curl requests
-Will be added later.
+### Запросы Curl
+Будет добавлена позже.
 
-[Top](#knowthenix)
+[Наверх](#knowthenix)
