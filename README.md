@@ -44,9 +44,9 @@ They need to be tested and clarified.
     * `KNOWTHENIX_ADMIN_PASSWORD=<enter-db-user-password>`
 * Test connection using any SQL client:
     * Postgres: `jdbc:postgresql://localhost:5432/knowthenix-prod`
-    * MySQL: `jdbc:mysql://localhost:3306/knowthenix-prod?userUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC`
+    * or MySQL: `jdbc:mysql://localhost:3306/knowthenix-prod?userUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC`
 * Run for the first time to populate with some initial data: 
-    * `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=prod --spring.sql.init.mode=always --spring.app.data.init=true`
+    * `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=init` or `--spring.active.profile=mysqlinit`
 * Run after initializing or run with empty db: 
     * `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=prod`
 * Use: 

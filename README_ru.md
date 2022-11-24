@@ -37,15 +37,15 @@ _Приложение еще не завершено. Оно находится 
 Нет гарантии получения результата на любой машине.
 Нуждаются в дальнейшем тестировании и прояснении.
 * Собрать проект: `mvn clean package`
-* Создать базу данных в PostgreSQL: `create database knowthenix-prod`
+* Создать базу данных в PostgreSQL или MySQL: `create database knowthenix-prod`
 * Создать переменные окружения для передачи имени пользователя и пароля в приложение:
     * `KNOWTHENIX_ADMIN=<enter-db-user-name>`
     * `KNOWTHENIX_ADMIN_PASSWORD=<enter-db-user-password>`
 * Протестировать соединение с БД используя любой SQL клиент:
     * Postgres: `jdbc:postgresql://localhost:5432/knowthenix-prod`
-    * MySQL: `jdbc:mysql://localhost:3306/knowthenix-prod?userUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC`
+    * либо MySQL: `jdbc:mysql://localhost:3306/knowthenix-prod?userUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC`
 * Запустить в первый раз для наполнения БД первичными данными: 
-    * `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=prod --spring.sql.init.mode=always --spring.app.data.init=true`
+    * `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=init` или `--spring.active.profile=mysqlinit`
 * Запускать впоследствии после инициализации БД, либо с пустой БД: 
     * `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=prod`
 * Использование: 
