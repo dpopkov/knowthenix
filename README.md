@@ -28,7 +28,7 @@ _Приложение еще не завершено. Оно находится 
     * Spring Data JPA
     * Spring MVC
     * H2 database
-    * PostgreSQL (или другая RDBMS)
+    * PostgreSQL, MySQL (или другая RDBMS)
 * Front-end
     * [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang) - проект на Angular.
 

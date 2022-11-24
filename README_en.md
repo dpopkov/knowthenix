@@ -29,7 +29,7 @@ This Knowledge Base is planned for later use as a source for generating records 
     * Spring Data JPA
     * Spring MVC
     * H2 database
-    * PostgreSQL (or other RDBMS with provided drivers)
+    * PostgreSQL, MySQL (or other RDBMS with provided drivers)
 * Front-end
     * [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang) - project built using Angular.
 

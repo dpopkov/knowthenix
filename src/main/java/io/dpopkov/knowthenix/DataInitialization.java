@@ -20,7 +20,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@Profile({Profiles.INIT, Profiles.DEV})
+@Profile({Profiles.INIT, Profiles.MYSQL_INIT, Profiles.DEV})
 @Component
 public class DataInitialization {
 
