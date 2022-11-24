@@ -1,7 +1,11 @@
 # Knowthenix
 
-The application is under development.
+_The application is under development._
 
+Translations:  
+* [Russian](README_ru.md)
+
+### Contents
 * [General Info](#general-info)
 * [Used Technologies](#used-technologies)
 * [How to Launch Manually](#how-to-launch-manually)
@@ -34,11 +38,13 @@ This section is not finished yet. These instructions are mostly for personal use
 There is no guarantee that they will produce expected result on any machine.
 They need to be tested and clarified.
 * Build: `mvn clean package`
-* Create database in PostgreSQL: `create database knowthenix-prod`
+* Create database in PostgreSQL or MySQL: `create database knowthenix-prod`
 * Provide environment variables for passing credentials to the application:
     * `KNOWTHENIX_ADMIN=<enter-db-user-name>`
     * `KNOWTHENIX_ADMIN_PASSWORD=<enter-db-user-password>`
-* Test connection `jdbc:postgresql://localhost:5432/knowthenix-prod` using any SQL client.
+* Test connection using any SQL client:
+    * Postgres: `jdbc:postgresql://localhost:5432/knowthenix-prod`
+    * MySQL: `jdbc:mysql://localhost:3306/knowthenix-prod?userUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC`
 * Run for the first time to populate with some initial data: 
     * `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=prod --spring.sql.init.mode=always --spring.app.data.init=true`
 * Run after initializing or run with empty db: 
@@ -63,7 +69,8 @@ Screenshots are taken from front-end [Knowthenix-ang](https://github.com/dpopkov
 The rest of screenshots for categories, questions, keyterms and sources will be added later.
 
 ### Database Schema
-Will be added later.
+The Entity Relationship diagram is generated in MySQL Workbench. It is not final.
+![DB Schema](docs/images/db-schema.png)
 
 ### Custom application properties and profiles
 Will be added later.

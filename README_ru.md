@@ -1,6 +1,6 @@
 # Knowthenix
 
-Приложение еще не завершено. Оно находится в процессе доработки.
+_Приложение еще не завершено. Оно находится в процессе доработки._
 
 На других языках:  
 * [English](README.md)
@@ -41,7 +41,9 @@
 * Создать переменные окружения для передачи имени пользователя и пароля в приложение:
     * `KNOWTHENIX_ADMIN=<enter-db-user-name>`
     * `KNOWTHENIX_ADMIN_PASSWORD=<enter-db-user-password>`
-* Протестировать соединение с БД `jdbc:postgresql://localhost:5432/knowthenix-prod` используя любой SQL клиент.
+* Протестировать соединение с БД используя любой SQL клиент:
+    * Postgres: `jdbc:postgresql://localhost:5432/knowthenix-prod`
+    * MySQL: `jdbc:mysql://localhost:3306/knowthenix-prod?userUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC`
 * Запустить в первый раз для наполнения БД первичными данными: 
     * `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=prod --spring.sql.init.mode=always --spring.app.data.init=true`
 * Запускать впоследствии после инициализации БД, либо с пустой БД: 
@@ -66,7 +68,8 @@
 Остальные скриншоты для Категорий, Вопросов, Ключевых Терминов и Источников будут добавлены позже.
 
 ### Схема БД
-Будет добавлена позже.
+Диаграмма сгенерирована в MySQL Workbench и не является окончательной.
+![DB Schema](docs/images/db-schema.png)
 
 ### Пользовательские аттрибуты приложения и профили
 Будет добавлена позже.
