@@ -85,7 +85,7 @@ public class AuthUserController {
     }
 
     @PostMapping
-//    @PreAuthorize("hasAuthority('" + USER_CREATE + "')")
+    @PreAuthorize("hasAuthority('" + USER_CREATE + "')")
     public ResponseEntity<AuthUserDto> addNewUser(
             @RequestParam("firstName") String firstName,
             @RequestParam("lastName") String lastName,
@@ -101,7 +101,7 @@ public class AuthUserController {
     }
 
     @PutMapping
-//    @PreAuthorize("hasAuthority('" + USER_UPDATE + "')")
+    @PreAuthorize("hasAuthority('" + USER_UPDATE + "')")
     public ResponseEntity<AuthUserDto> updateUser(
             @RequestParam("currentUsername") String currentUsername,
             @RequestParam("firstName") String newFirstName,
@@ -119,28 +119,28 @@ public class AuthUserController {
     }
 
     @GetMapping("/{username}")
-//    @PreAuthorize("hasAuthority('" + USER_READ + "')")
+    @PreAuthorize("hasAuthority('" + USER_READ + "')")
     public ResponseEntity<AuthUserDto> getByUsername(@PathVariable("username") String username) {
         AuthUserDto user = authUserService.findByUsername(username);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @GetMapping
-//    @PreAuthorize("hasAuthority('" + USER_READ + "')")
+    @PreAuthorize("hasAuthority('" + USER_READ + "')")
     public ResponseEntity<List<AuthUserDto>> getAllUsers() {
         List<AuthUserDto> all = authUserService.getAllUsers();
         return new ResponseEntity<>(all, HttpStatus.OK);
     }
 
     @PutMapping(RESET_PASSWORD_URL + "/{email}")
-//    @PreAuthorize("hasAuthority('" + USER_UPDATE + "')")
+    @PreAuthorize("hasAuthority('" + USER_UPDATE + "')")
     public ResponseEntity<AppHttpResponse> resetPassword(@PathVariable("email") String email) {
         authUserService.resetPassword(email);
         return new ResponseEntity<>(new AppHttpResponse(HttpStatus.OK, AN_EMAIL_SENT_TO + email), HttpStatus.OK);
     }
 
     @DeleteMapping("/{username}")
-//    @PreAuthorize("hasAuthority('" + USER_DELETE + "')")
+    @PreAuthorize("hasAuthority('" + USER_DELETE + "')")
     public ResponseEntity<AppHttpResponse> deleteUser(@PathVariable("username") String username) throws IOException {
         authUserService.deleteUserByUsername(username);
         return new ResponseEntity<>(new AppHttpResponse(HttpStatus.OK, USER_DELETED_SUCCESSFULLY), HttpStatus.OK);
