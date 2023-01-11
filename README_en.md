@@ -9,6 +9,7 @@ Translations:
 * [General Info](#general-info)
 * [Used Technologies](#used-technologies)
 * [How to Launch Manually](#how-to-launch-manually)
+* [How to make use of Front-end](#how-to-make-use-of-front-end-2-options)
 * [Screenshots](#screenshots)
 * [Database Schema](#database-schema)
 * [Custom application properties and profiles](#custom-application-properties-and-profiles)
@@ -47,11 +48,24 @@ They need to be tested and clarified.
     * or MySQL: `jdbc:mysql://localhost:3306/knowthenix-prod?userUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC`
 * Run for the first time to populate with some initial data: 
     * `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=init` or `--spring.active.profile=mysqlinit`
+    * after initialization there will exist user `admin` with password `admin`
 * Run after initializing or run with empty db: 
     * `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=prod`
 * Use: 
-    * start front-end [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang).
+    * with front-end [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang).
     * or run curl, httpie, Postman or other client.
+    
+### How to make use of Front-end (2 options) 
+* 1 - start front-end [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang) with its own server:
+    * go to front-end project directory
+    * run `ng serve`
+    * after starting back-end direct browser to `http://localhost:4200`
+* 2 - use compiled front-end
+    * go to front-end project directory
+    * run `ng build`
+    * copy all the compiled files from `dist` directory to `src/main/resources/static` directory of this back-end project
+    * run the application using IDE or make jar as usual
+    * direct browser to `http://localhost:8080`
 
 ### Screenshots
 

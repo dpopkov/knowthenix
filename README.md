@@ -8,7 +8,8 @@ _Приложение еще не завершено. Оно находится 
 ### Содержание
 * [Общая информация](#%D0%BE%D0%B1%D1%89%D0%B0%D1%8F-%D0%B8%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F)
 * [Используемые технологии](#%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D0%BC%D1%8B%D0%B5-%D1%82%D0%B5%D1%85%D0%BD%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D0%B8)
-* [Как запустить вручную](#%D0%BA%D0%B0%D0%BA-%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D1%82%D0%B8%D1%82%D1%8C-%D0%B2%D1%80%D1%83%D1%87%D0%BD%D1%83%D1%8E)
+* [Как запустить приложение](#%D0%BA%D0%B0%D0%BA-%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D1%82%D0%B8%D1%82%D1%8C-%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5)
+* [Как использовать Front-end](#%D0%BA%D0%B0%D0%BA-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D1%8C-front-end-2-%D0%B2%D0%B0%D1%80%D0%B8%D0%B0%D0%BD%D1%82%D0%B0)
 * [Скриншоты](#%D1%81%D0%BA%D1%80%D0%B8%D0%BD%D1%88%D0%BE%D1%82%D1%8B)
 * [Схема БД](#%D1%81%D1%85%D0%B5%D0%BC%D0%B0-%D0%B1%D0%B4)
 * [Пользовательские аттрибуты приложения и профили](#%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%B8%D0%B5-%D0%B0%D1%82%D1%82%D1%80%D0%B8%D0%B1%D1%83%D1%82%D1%8B-%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F-%D0%B8-%D0%BF%D1%80%D0%BE%D1%84%D0%B8%D0%BB%D0%B8)
@@ -32,7 +33,7 @@ _Приложение еще не завершено. Оно находится 
 * Front-end
     * [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang) - проект на Angular.
 
-### Как запустить вручную
+### Как запустить приложение
 Эта секция еще не завершена. Данные инструкции только для персонального использования.
 Нет гарантии получения результата на любой машине.
 Нуждаются в дальнейшем тестировании и прояснении.
@@ -46,11 +47,25 @@ _Приложение еще не завершено. Оно находится 
     * либо MySQL: `jdbc:mysql://localhost:3306/knowthenix-prod?userUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC`
 * Запустить в первый раз для наполнения БД первичными данными: 
     * `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=init` или `--spring.active.profile=mysqlinit`
+    * после инициализации будет создан пользователь `admin` с паролем `admin`
 * Запускать впоследствии после инициализации БД, либо с пустой БД: 
     * `java -jar knowthenix-X.Y.Z-SNAPSHOT.jar --spring.active.profile=prod`
 * Использование: 
-    * стартовать front-end [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang).
+    * с front-end [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang).
     * или использовать curl, httpie, Postman или другой http клиент.
+    
+### Как использовать Front-end (2 варианта)
+* 1 - запусть front-end [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang) на его собственном сервере:
+    * перейти в директорию проекта front-end
+    * запустить в терминале `ng serve`
+    * после старта back-end направить браузер на адрес `http://localhost:4200`
+    * по окончании работы для остановки сервера front-end можно нажать Ctrl+C в том же терминале
+* 2 - используя front-end откомпилированный в обычный javascript:
+    * перейти в директорию проекта front-end
+    * запустить в терминале `ng build`
+    * скопировать все откомпилированный файлы из папки `dist` в папку `src/main/resources/static` данного проекта
+    * далее либо запустить приложение используя IDE, либо собрать и запустить jar как обычно
+    * направить браузер на адрес `http://localhost:8080`
 
 ### Скриншоты
 
