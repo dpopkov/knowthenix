@@ -12,7 +12,8 @@ Translations:
 * [How to make use of Front-end](#how-to-make-use-of-front-end-2-options)
 * [Screenshots](#screenshots)
 * [Database Schema](#database-schema)
-* [Custom application properties and profiles](#custom-application-properties-and-profiles)
+* [Application Profiles](#application-profiles)
+* [Custom Application Properties](#custom-application-properties)
 * [Curl requests](#curl-requests)
 
 ### General Info
@@ -88,8 +89,23 @@ The rest of screenshots for categories, questions, keyterms and sources will be 
 The Entity Relationship diagram is generated in MySQL Workbench. It is not final.
 ![DB Schema](docs/images/db-schema.png)
 
-### Custom application properties and profiles
-Will be added later.
+### Application Profiles
+| Profile | Database | Configuration file |
+|---------|----------|--------------------|
+| dev     | H2 in-memory db     | application-dev.yml |
+| init    | initialization of PostgreSQL db      | application-init.yml |
+| mysqlinit| initialization of MySQL db      | application-mysqlinit.yml |
+| prod    | usage of initialized PostgreSQL db      | application-prod.yml |
+
+### Custom Application Properties
+| Name | Description |
+|---------|----------|
+| app.client.allowedOrigin | URL for a server that hosts files of front-end client |
+| app.data.init | Flag whether to initialize database when application starts |
+| app.security.permitall | Allows access to all URLs of the application |
+| app.security.maximumLoginAttempts | Maximum number of login attempts before locking user account |
+| app.security.loginAttemptsExpiration | Number of minutes after which login attempts cache expires for an entry |
+| app.security.loginAttemptsCacheLimit | The maximum number of entries the login attempts cache may contain |
 
 ### Curl requests
 Will be added later.
