@@ -56,15 +56,17 @@ They need to be tested and clarified.
     * or run curl, httpie, Postman or other client.
     
 ### How to make use of Front-end (2 options) 
+* Pre-condition: Angular CLI should be installed already.
 * 1 - start front-end [Knowthenix-ang](https://github.com/dpopkov/knowthenix-ang) with its own server:
     * go to front-end project directory
     * run `ng serve`
-    * after starting back-end direct browser to `http://localhost:4200`
+    * after starting front-end direct browser to `http://localhost:4200` (provided the back-end is running already)
 * 2 - use compiled front-end
     * go to front-end project directory
-    * run `ng build`
-    * copy all the compiled files from `dist` directory to `src/main/resources/static` directory of this back-end project
+    * run `ng build --prod` 
+    * copy all the compiled files from `dist/knowthenix` directory to `src/main/resources/static` directory of this back-end project
     * run the application using IDE or make jar as usual
+        * Important: use application property `--app.security.permitall=true` as temporary measure (will be fixed)
     * direct browser to `http://localhost:8080`
 
 ### Screenshots
